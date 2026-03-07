@@ -22,10 +22,12 @@ export const authenticate = async (
 
         const token = authHeader.split(" ")[1];
 
-        const decoded = jwt.verify(
-            token,
-            process.env.JWT_ACCESS_SECRET!
-        ) as unknown as JwtPayload;
+        if(!token){
+            throw new ApiError(401, "Token missing");
+        }
+        const secret = process.env.JWT_ACCESS_SECRET!;
+
+        const decoded = jwt.verify(token , secret) as unknown as JwtPayload;
 
         const user = await User.findById(decoded.id).select("-password");
 

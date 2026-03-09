@@ -14,27 +14,23 @@ export const authenticate = async (
 ) => {
     try {
 
-        const authHeader = req.headers.authorization;
-
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            throw new ApiError(401, "Unauthorized request");
-        }
-
-        const token = authHeader.split(" ")[1];
+        const token = req.cookies.accessToken;
 
         if(!token){
-            throw new ApiError(401, "Token missing");
+            throw new ApiError(401, "Unauthorized");
         }
-        const secret = process.env.JWT_ACCESS_SECRET!;
 
-        const decoded = jwt.verify(token , secret) as unknown as JwtPayload;
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_ACCESS_SECRET!
+        ) as unknown as JwtPayload;
 
         const user = await User.findById(decoded.id).select("-password");
 
-        if (!user) {
-            throw new ApiError(401, "Invalid access token");
+        if(!user){
+            throw new ApiError(401, "Invalid token");
         }
-
+        
         req.user = user;
 
         next();

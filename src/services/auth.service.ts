@@ -58,7 +58,7 @@ export class AuthService {
         };
     }
 
-    static async refreshToken(oldToken: string){
+    static async refreshAccessToken(oldToken: string){
 
         const user = await User.findOne({ refreshToken: oldToken });
 

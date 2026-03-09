@@ -28,6 +28,11 @@ const userSchema = new Schema<IUser>(
             required: true,
             select: false 
         },
+        role: {
+            type: String,
+            enum: ["Admin", "ProjectManager", "Developer"],
+            default: "Developer",
+        },
         refreshToken: {
             type: String,
             select: false,

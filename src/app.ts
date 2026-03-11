@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import projectRoutes from './routes/project.routes';
 import sprintRoutes from './routes/sprint.routes';
+import featureRoutes from './routes/feature.routes';
 
 const app = express();
 
@@ -25,5 +26,6 @@ app.use("/api/v1/auth" , authRoutes);
 app.use("/api/v1/users" , userRoutes);
 app.use("/api/v1/projects" , projectRoutes);
 app.use("/api/v1/sprints", sprintRoutes);
+app.use("/api/v1/features", featureRoutes);
 
 export default app;

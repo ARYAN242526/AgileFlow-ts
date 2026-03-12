@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../middleware/auth.middleware";
+import { authorizeRoles } from "../middleware/role.middleware";
+import { ROLES } from "../constants/roles";
 import {
     createProject,
     getProjects,
@@ -12,10 +14,34 @@ const router = Router();
 
 router.use(authenticate);
 
-router.post('/', createProject);
-router.get('/', getProjects);
-router.get('/:id', getProject);
-router.patch('/:id', updateProject);
-router.delete('/:id', deleteProject);
+router.post(
+    '/',
+    authorizeRoles(ROLES.ADMIN, ROLES.PROJECT_MANAGER),
+    createProject
+);
+
+router.get(
+    '/',
+    authorizeRoles(ROLES.ADMIN, ROLES.PROJECT_MANAGER, ROLES.DEVELOPER, ROLES.VIEWER),
+    getProjects
+);
+
+router.get(
+    '/:id',
+    authorizeRoles(ROLES.ADMIN, ROLES.PROJECT_MANAGER, ROLES.DEVELOPER, ROLES.VIEWER),
+    getProject
+);
+
+router.patch(
+    '/:id',
+    authorizeRoles(ROLES.ADMIN, ROLES.PROJECT_MANAGER), 
+    updateProject
+);
+
+router.delete(
+    '/:id',
+    authorizeRoles(ROLES.ADMIN), 
+    deleteProject
+);
 
 export default router;

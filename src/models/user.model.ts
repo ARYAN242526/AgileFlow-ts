@@ -1,11 +1,12 @@
 import mongoose , {Document , Schema} from "mongoose";
 import bcrypt from 'bcryptjs';
+import { ROLES } from "../constants/roles";
 
 export interface IUser extends Document {
     name: string
     email: string
     password: string
-    role: "Admin" | "ProjectManager" | "Developer"
+    role: ROLES;
     refreshToken?: string | null
     comparePassword(password: string): Promise<boolean>
 }
@@ -30,8 +31,8 @@ const userSchema = new Schema<IUser>(
         },
         role: {
             type: String,
-            enum: ["Admin", "ProjectManager", "Developer"],
-            default: "Developer",
+            enum: Object.values(ROLES),
+            default: ROLES.DEVELOPER
         },
         refreshToken: {
             type: String,

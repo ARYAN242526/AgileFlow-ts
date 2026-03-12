@@ -37,7 +37,7 @@ export class ProjectService {
         const project = await Project.findByIdAndUpdate(
             projectId,
             data,
-            { new: true }
+            { returnDocument : "after" }
         );
 
         if(!project) {

@@ -1,3 +1,4 @@
+import { after } from "node:test";
 import { User } from "../models/user.model";
 import { ApiError } from "../utils/ApiError";
 
@@ -18,7 +19,7 @@ export class UserService {
         const updatedUser = await User.findByIdAndUpdate(
             userId,
             data,
-            { new : true} 
+            { returnDocument : "after"} 
         ).select("-password -refreshToken");
 
         if(!updatedUser){
@@ -30,7 +31,7 @@ export class UserService {
 
     static async changePassword(userId: string, oldPasssword: string, newPassword: string){
 
-        const user = await User.findById(userId);
+        const user = await User.findById(userId).select("+password");
 
         if(!user){
             throw new ApiError(404, "User not found");

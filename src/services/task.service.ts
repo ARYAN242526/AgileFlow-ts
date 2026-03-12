@@ -28,7 +28,7 @@ export class TaskService {
         const task = await Task.findByIdAndUpdate(
             taskId,
             data,
-            { new: true }
+            { returnDocument : "after" }
         );
 
         if(!task) {

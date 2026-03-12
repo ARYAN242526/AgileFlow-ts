@@ -39,7 +39,7 @@ export class FeatureService {
         const feature = await Feature.findByIdAndUpdate(
             featureId,
             data,
-            { new: true }
+            { returnDocument : "after" }
         );
 
         if (!feature) {

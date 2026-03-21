@@ -30,7 +30,7 @@ function LoginPage() {
 
   return (
     <div>
-      <h2>Login</h2>
+      <h2 className="text-red-500">Login</h2>
 
       <input
       type="email"

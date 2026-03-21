@@ -1,8 +1,10 @@
-
+import MainLayout from "../../components/layout/MainLayout"
 
 function DashBoardPage() {
   return (
-    <div>DashBoardPage</div>
+    <MainLayout>
+      <h1 className="text-2xl font-bold">DashBoard</h1>
+    </MainLayout>
   )
 }
 

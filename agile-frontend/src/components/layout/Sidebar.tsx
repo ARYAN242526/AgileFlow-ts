@@ -36,6 +36,15 @@ export default function Sidebar() {
           Projects
         </NavLink>
 
+        <NavLink
+        to="/features"
+        className={({ isActive }) => 
+          `${linkClass} ${isActive ? activeClass: inactiveClass}`
+        }
+        >
+          Features
+        </NavLink>
+
          <NavLink
           to="/tasks"
           className={({ isActive }) =>

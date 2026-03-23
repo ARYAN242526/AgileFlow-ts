@@ -7,6 +7,8 @@ import ProjectsPage from '../pages/projects/ProjectsPage';
 
 import ProtectedRoute from './ProtectedRoute';
 import RoleProtectedRoute from './RoleProtectedRoute';
+import FeaturesPage from '../pages/features/FeaturesPage';
+import TasksPage from '../pages/tasks/TasksPage';
 
 
 export default function AppRoutes() {
@@ -34,6 +36,24 @@ export default function AppRoutes() {
             <RoleProtectedRoute allowedRoles={["Admin" , "ProjectManager"]}>
                 <ProjectsPage />
             </RoleProtectedRoute>
+            }
+            />
+
+            <Route
+            path="/features"
+            element={
+                <ProtectedRoute>
+                    <FeaturesPage />
+                </ProtectedRoute>
+            }
+            />
+
+            <Route
+            path="/tasks"
+            element={
+                <ProtectedRoute>
+                    <TasksPage />
+                </ProtectedRoute>
             }
             />
         </Routes>

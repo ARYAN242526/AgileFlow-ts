@@ -9,6 +9,7 @@ import ProtectedRoute from './ProtectedRoute';
 import RoleProtectedRoute from './RoleProtectedRoute';
 import FeaturesPage from '../pages/features/FeaturesPage';
 import TasksPage from '../pages/tasks/TasksPage';
+import SprintsPage from '../pages/sprints/SprintsPage';
 
 
 export default function AppRoutes() {
@@ -36,6 +37,15 @@ export default function AppRoutes() {
             <RoleProtectedRoute allowedRoles={["Admin" , "ProjectManager"]}>
                 <ProjectsPage />
             </RoleProtectedRoute>
+            }
+            />
+
+            <Route
+            path="/sprints"
+            element={
+                <ProtectedRoute>
+                    <SprintsPage />
+                </ProtectedRoute>
             }
             />
 

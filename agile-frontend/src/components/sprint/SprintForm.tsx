@@ -64,7 +64,7 @@ export default function SprintForm({
             onChange={(e) => setProjectId(e.target.value)}
             >
 
-            <option value="">Seelct Project</option>
+            <option value="">Select Project</option>
             {projects?.map((p) => (
                 <option key={p._id} value={p._id}>
                     {p.name}

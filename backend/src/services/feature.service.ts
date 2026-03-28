@@ -1,13 +1,35 @@
 import { Feature } from "../models/feature.model";
+import { Sprint } from "../models/sprint.model";
 import { ApiError } from "../utils/ApiError";
 
 export class FeatureService {
 
-    static async createFeature(projectId: string, userId: string, data: any) {
+    // Create Feature (derive project from sprint) 
+    static async createFeature(userId: string, data: any) {
+
+        const { title, description, sprint, status} = data;
+
+        if(!title) {
+            throw new ApiError(400, "Title is required");
+        }
+
+        if(!sprint) {
+            throw new ApiError(400, "Sprint is required");
+        }
+
+        // validate sprint
+        const sprintDoc = await Sprint.findById(sprint);
+
+        if (!sprintDoc) {
+            throw new ApiError(404, "Sprint not found");
+        }
 
         const feature = await Feature.create({
-            ...data,
-            project: projectId,
+            title,
+            description,
+            sprint,
+            project: sprintDoc.project, // derive project
+            status,
             createdBy: userId
         });
 
@@ -18,6 +40,17 @@ export class FeatureService {
 
         const features = await Feature
             .find({ project: projectId })
+            .populate("sprint", "name")
+            .sort({ createdAt: -1 });
+
+        return features;
+    }
+
+    // get features by sprint
+    static async getSprintFeatures(sprintId: string) {
+
+        const features = await Feature
+            .find({ sprint: sprintId })
             .sort({ createdAt: -1 });
 
         return features;
@@ -25,8 +58,11 @@ export class FeatureService {
 
     static async getFeatureById(featureId: string) {
 
-        const feature = await Feature.findById(featureId);
-
+        const feature = await Feature
+            .findById(featureId)
+            .populate("sprint", "name")
+            .populate("project", "name");
+        
         if (!feature) {
             throw new ApiError(404, "Feature not found");
         }
@@ -56,5 +92,7 @@ export class FeatureService {
         if (!feature) {
             throw new ApiError(404, "Feature not found");
         }
+
+        return;
     }
 }

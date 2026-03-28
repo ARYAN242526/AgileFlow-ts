@@ -4,12 +4,10 @@ import { ApiResponse } from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asyncHandler";
 
 export const createFeature = asyncHandler(async (req: Request, res: Response) => {
-
-    const { projectId } = req.params;
-
+    
     const userId = req.user!._id.toString();
 
-    const feature = await FeatureService.createFeature(projectId as string, userId, req.body);
+    const feature = await FeatureService.createFeature(userId, req.body);
 
     return res
             .status(201)
@@ -23,10 +21,20 @@ export const getProjectFeatures = asyncHandler(async (req: Request, res: Respons
     const features = await FeatureService.getProjectFeatures(projectId as string);
 
     res.status(200).json(
-        new ApiResponse(200, features, "Features fetched")
+        new ApiResponse(200, features, "Project Features fetched")
     );
 });
 
+export const getSprintFeatures = asyncHandler(async (req: Request, res: Response) => {
+
+    const { sprintId } = req.params;
+
+    const features = await FeatureService.getSprintFeatures(sprintId as string);
+
+    res.status(200).json(
+        new ApiResponse(200, features, "Sprint features fetched")
+    );
+});
 
 export const getFeature = asyncHandler(async (req: Request, res: Response) => {
 

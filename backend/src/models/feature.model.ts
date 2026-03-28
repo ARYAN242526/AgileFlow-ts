@@ -4,6 +4,7 @@ export interface IFeature extends Document {
     title: string;
     description: string;
     project: Types.ObjectId;
+    sprint: Types.ObjectId;
     status: "planned" | "in-progress" | "completed";
     createdBy: Types.ObjectId;
 }
@@ -22,6 +23,11 @@ const featureSchema = new Schema<IFeature>(
             type: Schema.Types.ObjectId,
             ref: "Project",
             required: true
+        },
+        sprint : {
+            type: Schema.Types.ObjectId,
+            ref: "Sprint",
+            required: true,
         },
         createdBy: {
             type: Schema.Types.ObjectId,

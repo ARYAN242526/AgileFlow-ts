@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
     createFeature,
     getProjectFeatures,
+    getSprintFeatures,
     getFeature,
     updateFeature,
     deleteFeature
@@ -14,6 +15,8 @@ const router = Router();
 router.post("/:projectId", authenticate, createFeature);
 
 router.get("/:projectId", authenticate, getProjectFeatures);
+
+router.get("/sprint/:sprintId" , authenticate, getSprintFeatures);
 
 router.get("/single/:id", authenticate, getFeature);
 

@@ -7,6 +7,7 @@ import type { Project } from "../../types/project";
 
 
 export default function ProjectsPage() {
+
   const [projects, setProjects] = useState<Project[]>([]);
 
   const fetchProjects = async () => {

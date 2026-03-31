@@ -1,12 +1,7 @@
 import api from "./api";
 
-export const createFeature = async (data: {
-    title: string;
-    description? : string;
-    sprint: string;
-    status? : string; 
-}) => {
-    const res = await api.post("/features", data);
+export const createFeature = async (projectId: string, data: any) => {
+    const res = await api.post(`/features/${projectId}`, data);
     return res.data.data;
 };
 

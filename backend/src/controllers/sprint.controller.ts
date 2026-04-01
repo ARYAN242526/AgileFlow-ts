@@ -18,7 +18,7 @@ export const getProjectSprints = asyncHandler(async (req: Request, res: Response
 
     const { projectId } = req.params;
 
-    const sprints = await SprintService.getProjectSprints(projectId as string);
+    const sprints = await SprintService.getProjectSprints(projectId as string) || [];
 
     res.status(200).json(
         new ApiResponse(200, sprints, "Sprints fetched")

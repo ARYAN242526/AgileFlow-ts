@@ -12,7 +12,10 @@ export default function FeaturesPage() {
     const [features, setFeatures] = useState<any[]>([]);
     const [sprints, setSprints] = useState<any[]>([]);
     const [selectedSprint, setSelectedSprint] = useState("");
-    const [loading, setLoading] = useState(false);
+
+    // separate loading classes
+    const [sprintLoading, setSprintLoading] = useState(false);
+    const [featureLoading, setFeatureLoading] = useState(false);
 
     // fetch sprints using dynamic projectId
     const fetchSprints = async () => {
@@ -20,7 +23,7 @@ export default function FeaturesPage() {
         try {
             if(!projectId) return;
 
-            setLoading(true);
+            setSprintLoading(true);
             
             const data = await getSprints(projectId);
             setSprints(data);
@@ -32,21 +35,21 @@ export default function FeaturesPage() {
         } catch (err) {
             console.error(err);
         } finally {
-            setLoading(false);
+            setSprintLoading(false);
         }
     }
 
     // fetch features by sprint
     const fetchFeatures = async (sprintId: string) => {
         try {
-            setLoading(true);
+            setFeatureLoading(true);
 
             const data = await getSprintFeatures(sprintId);
             setFeatures(data);
         } catch (err) {
             console.error(err);
         } finally {
-            setLoading(false);
+            setFeatureLoading(false);
         }
     };
 
@@ -78,37 +81,49 @@ export default function FeaturesPage() {
         <MainLayout>
             <h1 className="text-2xl font-bold mb-6">Features</h1>
 
-                {!loading && sprints.length === 0 && (
-                    <p className="text-red-500 mb-4">
-                        No sprints found. Please create a sprint first.
-                    </p>
-                )}
+            {/* Sprint state handling */}
+            {sprintLoading ? (
+                <p>Loading sprints...</p>
+            ) : sprints.length === 0 ? (
+                <p className="text-red-500 mb-4">
+                    No sprints found. Please create a sprint first.
+                </p>
+            ) : (
+                <>
+                {/* Sprint Filter */}
+                    <select
+                    className="border p-2 mb-4"
+                    value={selectedSprint}
+                    onChange={(e) => setSelectedSprint(e.target.value)}
+                    >
+                    <option value="">Select Sprint</option>
+                    {sprints?.map((s: any) => (
+                        <option key={s._id} value={s._id}>
+                            {s.name}
+                        </option>
+                    ))}
+                </select>
+                </>
+            )}
 
-            {/* Sprint Filter */}
-            <select
-            className="border p-2 mb-4"
-            value={selectedSprint}
-            onChange={(e) => setSelectedSprint(e.target.value)}
-            >
-                <option value="">Select Sprint</option>
-                {sprints?.map((s: any) => (
-                    <option key={s._id} value={s._id}>
-                        {s.name}
-                    </option>
-                ))}
-            </select>
+             <FeatureForm
+                onCreate={handleCreate}
+                sprints={sprints}
+                selectedSprint={selectedSprint}
+                />
 
-             <FeatureForm onCreate={handleCreate} sprints={sprints} />
-
+              {/* Features Section */}
             <div className="grid grid-cols-3 gap-4">
-                {loading ? (
-                <p>Loading...</p>
+                {featureLoading ? (
+                <p>Loading features...</p>
                 ) : features.length > 0 ? (
-                    features.map((f) => (
+                features.map((f) => (
                     <FeatureCard key={f._id} feature={f} />
                 ))
                 ) : (
-                <p className="text-gray-500">No features found</p>
+                !sprintLoading && (
+                    <p className="text-gray-500">No features found</p>
+                )
                 )}
             </div>
         </MainLayout>

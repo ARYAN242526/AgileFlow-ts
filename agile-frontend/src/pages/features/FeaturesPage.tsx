@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import MainLayout from "../../components/layout/MainLayout";
 import FeatureCard from "../../components/feature/FeatureCard";
 import FeatureForm from "../../components/feature/FeatureForm";
@@ -8,6 +8,7 @@ import { getSprints } from "../../services/sprintService";
 
 export default function FeaturesPage() {
     const {projectId} = useParams();
+    const navigate = useNavigate();
 
     const [features, setFeatures] = useState<any[]>([]);
     const [sprints, setSprints] = useState<any[]>([]);
@@ -39,6 +40,10 @@ export default function FeaturesPage() {
         }
     }
 
+    useEffect(() => {
+        fetchSprints();
+    } , [projectId]);
+
     // fetch features by sprint
     const fetchFeatures = async (sprintId: string) => {
         try {
@@ -52,10 +57,6 @@ export default function FeaturesPage() {
             setFeatureLoading(false);
         }
     };
-
-    useEffect(() => {
-        fetchSprints();
-    } , [projectId]);
 
     useEffect(() => {
         if(selectedSprint) {
@@ -82,35 +83,47 @@ export default function FeaturesPage() {
             <h1 className="text-2xl font-bold mb-6">Features</h1>
 
             {/* Sprint state handling */}
-            {sprintLoading ? (
-                <p>Loading sprints...</p>
-            ) : sprints.length === 0 ? (
-                <p className="text-red-500 mb-4">
-                    No sprints found. Please create a sprint first.
-                </p>
-            ) : (
-                <>
-                {/* Sprint Filter */}
-                    <select
-                    className="border p-2 mb-4"
-                    value={selectedSprint}
-                    onChange={(e) => setSelectedSprint(e.target.value)}
-                    >
-                    <option value="">Select Sprint</option>
-                    {sprints?.map((s: any) => (
-                        <option key={s._id} value={s._id}>
-                            {s.name}
-                        </option>
-                    ))}
-                </select>
-                </>
-            )}
+                {sprintLoading ? (
+                    <p>Loading sprints...</p>
+                ) : sprints.length === 0 ? (
+                    <div className="mb-4">
+                        <p className="text-red-500 mb-2">
+                            No sprints found. Please create a sprint first.
+                        </p>
 
-             <FeatureForm
+                        <button
+                            onClick={() => navigate(`/projects/${projectId}/sprints`)}
+                            className="bg-blue-500 text-white px-4 py-2 rounded"
+                        >
+                            Go to Sprints
+                        </button>
+                    </div>
+                ) : (
+                    <>
+                        {/* Sprint Filter */}
+                        <select
+                            className="border p-2 mb-4"
+                            value={selectedSprint}
+                            onChange={(e) => setSelectedSprint(e.target.value)}
+                        >
+                            <option value="">Select Sprint</option>
+                            {sprints?.map((s: any) => (
+                                <option key={s._id} value={s._id}>
+                                    {s.name}
+                                </option>
+                            ))}
+                        </select>
+                    </>
+                )}
+           
+
+             {sprints.length > 0 && (
+                <FeatureForm
                 onCreate={handleCreate}
                 sprints={sprints}
                 selectedSprint={selectedSprint}
                 />
+             )}
 
               {/* Features Section */}
             <div className="grid grid-cols-3 gap-4">

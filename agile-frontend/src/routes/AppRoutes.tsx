@@ -4,6 +4,7 @@ import LoginPage from '../pages/auth/LoginPage';
 import RegisterPage from '../pages/auth/RegisterPage';
 import DashBoardPage from '../pages/dashboard/DashboardPage';
 import ProjectsPage from '../pages/projects/ProjectsPage';
+import ProjectDetailsPage from '../pages/projects/ProjectDetailsPage';
 
 import ProtectedRoute from './ProtectedRoute';
 import RoleProtectedRoute from './RoleProtectedRoute';
@@ -40,8 +41,18 @@ export default function AppRoutes() {
             }
             />
 
+            <Route  
+            path='/projects/:projectId'
+            element={
+                <ProtectedRoute>
+                    <ProjectDetailsPage />
+                </ProtectedRoute>
+            }
+            
+            />
+
             <Route
-            path="/sprints"
+            path="/projects/:projectId/sprints"
             element={
                 <ProtectedRoute>
                     <SprintsPage />
@@ -50,7 +61,7 @@ export default function AppRoutes() {
             />
 
             <Route
-            path="/features"
+            path="/projects/:projectId/features"
             element={
                 <ProtectedRoute>
                     <FeaturesPage />
@@ -59,7 +70,7 @@ export default function AppRoutes() {
             />
 
             <Route
-            path="/tasks"
+            path="/projects/:projectId/tasks"
             element={
                 <ProtectedRoute>
                     <TasksPage />

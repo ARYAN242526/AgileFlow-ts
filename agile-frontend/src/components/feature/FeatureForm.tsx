@@ -10,8 +10,9 @@ export default function FeatureForm({ onCreate, sprints, selectedSprint }: Props
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [error, setError] = useState("");
+    const [creating , setCreating] = useState(false);
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if(!title) {
             setError("Title is required");
             return;
@@ -22,23 +23,37 @@ export default function FeatureForm({ onCreate, sprints, selectedSprint }: Props
             return;
         }
 
-        setError(""); // clear error
-
-        onCreate({
+       try {
+         setError("");
+         setCreating(true);
+ 
+         await onCreate({
             title,
             description,
             sprint: selectedSprint,
-        });
-        // reset
-        setTitle("");
-        setDescription("");
+         });
+
+         // reset only if success
+         setTitle("");
+         setDescription("");
+       } catch (error) {
+            setError("Failed to create feature");
+       } finally {
+        setCreating(false);
+       }
     };
 
     const isDisabled = !title || !selectedSprint;
 
+    const sprintName = sprints.find((s) => s._id === selectedSprint)?.name || "None";
+
     return (
         <div className="mb-6 p-4 border rounded">
             <h3 className="font-bold mb-2">Create Feature</h3>
+
+            <p className="mb-2 text-sm text-gray-600">
+                Sprint: {sprintName}
+            </p>
 
             {error && <p className="text-red-500 mb-2">{error}</p>}
 
@@ -59,27 +74,17 @@ export default function FeatureForm({ onCreate, sprints, selectedSprint }: Props
             onChange={(e) => setDescription(e.target.value)}
             />
 
-                <select
-                className="border p-2 mr-2 bg-gray-100"
-                value={selectedSprint}
-                disabled
-            >
-                <option value="">Select Sprint</option>
-                {sprints.map((s) => (
-                    <option key={s._id} value={s._id}>
-                    {s.name}
-                </option>
-                ))}
-            </select>
 
             <button
             onClick={handleSubmit}
             disabled ={isDisabled} 
             className={`px-3 py-2 text-white ${
-                isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500"
+                isDisabled || creating 
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-500"
             }`}
             >
-                Create
+                {creating ? "Creating..." : "Create"}
             </button>
         </div>
     )

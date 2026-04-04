@@ -43,11 +43,15 @@ export default function ProjectsPage() {
       <ProjectForm onCreate={handleCreate} />
 
       {/* Project List */}
-      <div className="grid grid-cols-3 gap-4">
+    <div className="relative z-10 p-4">
+        <div className="grid grid-cols-3 gap-4">
         {projects?.map((project) => (
-          <ProjectCard key={project._id} project={project} />
+          <div  key={project._id} className="cursor-pointer">
+             <ProjectCard project={project} />
+          </div>
         ))}
       </div>
+    </div>
     </MainLayout>
   )
 }

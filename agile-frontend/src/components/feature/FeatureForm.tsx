@@ -1,91 +1,52 @@
 import { useState } from "react";
 
-interface Props {
-    onCreate: (data: any) => void;
-    sprints : {_id: string; name: string }[];
-    selectedSprint: string;
-}
+export default function FeatureForm({
+  onCreate,
+}: {
+  onCreate: (data: {
+    title: string;
+    description?: string;
+  }) => void;
+}) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
-export default function FeatureForm({ onCreate, sprints, selectedSprint }: Props) {
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [error, setError] = useState("");
-    const [creating , setCreating] = useState(false);
+  const handleSubmit = () => {
+    if (!title.trim()) return;
 
-    const handleSubmit = async () => {
-        if(!title) {
-            setError("Title is required");
-            return;
-        }
+    onCreate({ title, description });
 
-        if(!selectedSprint) {
-            setError("Please select a sprint");
-            return;
-        }
+    setTitle("");
+    setDescription("");
+  };
 
-       try {
-         setError("");
-         setCreating(true);
- 
-         await onCreate({
-            title,
-            description,
-            sprint: selectedSprint,
-         });
+  return (
+    <div className="bg-white p-4 rounded-xl shadow mb-6">
+      <h2 className="font-semibold mb-3">Create Feature</h2>
 
-         // reset only if success
-         setTitle("");
-         setDescription("");
-       } catch (error) {
-            setError("Failed to create feature");
-       } finally {
-        setCreating(false);
-       }
-    };
+      {/* Title */}
+      <input
+        type="text"
+        placeholder="Feature Title"
+        className="w-full mb-2 p-2 border rounded"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
 
-    const isDisabled = !title || !selectedSprint;
+      {/* Description */}
+      <textarea
+        placeholder="Feature Description"
+        className="w-full mb-2 p-2 border rounded"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
 
-    const sprintName = sprints.find((s) => s._id === selectedSprint)?.name || "None";
-
-    return (
-        <div className="mb-6 p-4 border rounded">
-            <h3 className="font-bold mb-2">Create Feature</h3>
-
-            <p className="mb-2 text-sm text-gray-600">
-                Sprint: {sprintName}
-            </p>
-
-            {error && <p className="text-red-500 mb-2">{error}</p>}
-
-            <input
-            placeholder="Title"
-            className="border p-2 mr-2"
-            value={title}
-            onChange={(e) => {
-                setTitle(e.target.value);
-                setError("");
-            }}
-            />
-
-            <input
-            placeholder="Description"
-            className="border p-2 mr-2"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            />
-
-
-            <button
-            onClick={handleSubmit}
-            disabled ={isDisabled} 
-            className={`px-3 py-2 text-white ${
-                isDisabled || creating 
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-500"
-            }`}
-            >
-                {creating ? "Creating..." : "Create"}
-            </button>
-        </div>
-    )
+      <button
+        onClick={handleSubmit}
+        className="bg-indigo-500 text-white px-4 py-2 rounded"
+      >
+        Create Feature
+      </button>
+    </div>
+  );
 }

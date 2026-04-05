@@ -61,7 +61,7 @@ export default function AppRoutes() {
             />
 
             <Route
-            path="/projects/:projectId/features"
+            path="/projects/:projectId/sprints/:sprintId/features"
             element={
                 <ProtectedRoute>
                     <FeaturesPage />
@@ -70,7 +70,7 @@ export default function AppRoutes() {
             />
 
             <Route
-            path="/projects/:projectId/tasks"
+            path="/projects/:projectId/sprints/:sprintId/features/:featureId/tasks"
             element={
                 <ProtectedRoute>
                     <TasksPage />

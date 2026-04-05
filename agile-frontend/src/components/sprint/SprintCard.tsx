@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import type { Sprint } from "../../types/sprint";
 import { 
     startSprint, 
@@ -7,30 +8,34 @@ import {
 
 export default function SprintCard({
     sprint,
-    refresh 
+    refresh,
+    projectId,
 } : { 
     sprint: Sprint;
     refresh: () => void;
+    projectId: string;
 }) {
 
-        const handleStart = async () => {
-            await startSprint(sprint._id);
-            refresh();
-        };
+    const navigate = useNavigate();
 
-        const handleComplete = async () => {
-            await completeSprint(sprint._id);
-            refresh();
-        };
+    const formatDate = (date: string) => {
+        return new Date(date).toLocaleDateString("en-GB");
+    };
 
-        const handleDelete = async () => {
-            await deleteSprint(sprint._id);
-            refresh();
-        };
+    const handleStart = async () => {
+        await startSprint(sprint._id);
+        refresh();
+    };
 
-        const formatDate = (date: string) => {
-            return new Date(date).toLocaleDateString("en-GB");
-        };
+    const handleComplete = async () => {
+        await completeSprint(sprint._id);
+        refresh();
+    };
+
+    const handleDelete = async () => {
+        await deleteSprint(sprint._id);
+        refresh();
+    };
 
     return (
         <div className="bg-white p-4 rounded-xl shadow">
@@ -75,6 +80,14 @@ export default function SprintCard({
           Delete
         </button>
         </div>
+        <button
+            onClick={() =>
+            navigate(`/projects/${projectId}/sprints/${sprint._id}/features`)
+            }
+            className="bg-indigo-500 text-white px-3 py-1 rounded mt-4 w-full"
+        >
+        View Features
+      </button>
     </div>
     );
 }

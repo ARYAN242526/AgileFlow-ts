@@ -6,6 +6,7 @@ import { getSprints, createSprint } from "../../services/sprintService";
 import type { Sprint } from "../../types/sprint";
 
 export default function SprintsPage() {
+
     const { projectId } = useParams();
 
     const [sprints, setSprints] = useState<Sprint[]>([]);
@@ -35,6 +36,7 @@ export default function SprintsPage() {
                 key={sprint._id}
                 sprint={sprint}
                 refresh={fetchSprints}
+                projectId={projectId!}
                 />
             ))}
         </div>

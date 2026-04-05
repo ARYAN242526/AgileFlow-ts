@@ -40,17 +40,15 @@ export default function ProjectsPage() {
       <h1 className="text-2xl font-bold mb-6">Projects</h1>
 
       {/* Create Project */}
-      <ProjectForm onCreate={handleCreate} />
+      <div className="mb-6">
+        <ProjectForm onCreate={handleCreate} />
+      </div>
 
       {/* Project List */}
-    <div className="relative z-10 p-4">
-        <div className="grid grid-cols-3 gap-4">
-        {projects?.map((project) => (
-          <div  key={project._id} className="cursor-pointer">
-             <ProjectCard project={project} />
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {projects.map((project) => (
+          <ProjectCard key={project._id} project={project} />
         ))}
-      </div>
     </div>
     </MainLayout>
   )

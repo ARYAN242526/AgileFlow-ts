@@ -1,24 +1,16 @@
-import { useState, useEffect } from "react";
-import { getProjects } from "../../services/projectService";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 
 export default function SprintForm({
     onCreate,
 }: {
     onCreate: (data: any) => void;
 }) {
+    const { projectId } = useParams();
+
     const [name, setName] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [projectId, setProjectId] = useState("");
-    const [projects, setProjects] = useState<any[]>([]);
-
-    useEffect(() => {
-        const fetchProjects = async () => {
-            const data = await getProjects();
-            setProjects(data);
-        };
-        fetchProjects();
-    }, []);
 
     const handleSubmit = () => {
         if(!name || !projectId) return;
@@ -28,7 +20,6 @@ export default function SprintForm({
         setName("");
         setStartDate("");
         setEndDate("");
-        setProjectId("");
     };
     
     return (
@@ -57,26 +48,11 @@ export default function SprintForm({
             onChange={(e) => setEndDate(e.target.value)}
             />
 
-            {/* Project Dropdown */}
-            <select
-            className="w-full mb-2 p-2 border rounded"
-            value={projectId}
-            onChange={(e) => setProjectId(e.target.value)}
-            >
-
-            <option value="">Select Project</option>
-            {projects?.map((p) => (
-                <option key={p._id} value={p._id}>
-                    {p.name}
-                </option>
-            ))}
-            </select>
-
             <button
             onClick={handleSubmit}
             className="bg-indigo-500 text-white px-4 py-2 rounded"
             >
-                Create
+                Create Sprint
             </button>
         </div>
     )

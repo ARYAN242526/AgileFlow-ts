@@ -15,6 +15,7 @@ export class SprintService {
     static async getProjectSprints(projectId: string) {
         const sprints = await Sprint
                 .find({ project: projectId })
+                .populate("project", "name")
                 .sort({ createdAt: -1 });
 
         return sprints;

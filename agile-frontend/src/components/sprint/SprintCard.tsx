@@ -1,6 +1,37 @@
 import type { Sprint } from "../../types/sprint";
+import { 
+    startSprint, 
+    completeSprint, 
+    deleteSprint 
+} from "../../services/sprintService";
 
-export default function SprintCard({ sprint } : { sprint: Sprint}) {
+export default function SprintCard({
+    sprint,
+    refresh 
+} : { 
+    sprint: Sprint;
+    refresh: () => void;
+}) {
+
+        const handleStart = async () => {
+            await startSprint(sprint._id);
+            refresh();
+        };
+
+        const handleComplete = async () => {
+            await completeSprint(sprint._id);
+            refresh();
+        };
+
+        const handleDelete = async () => {
+            await deleteSprint(sprint._id);
+            refresh();
+        };
+
+        const formatDate = (date: string) => {
+            return new Date(date).toLocaleDateString("en-GB");
+        };
+
     return (
         <div className="bg-white p-4 rounded-xl shadow">
             <h3 className="font-semibold text-lg">{sprint.name}</h3>
@@ -10,8 +41,40 @@ export default function SprintCard({ sprint } : { sprint: Sprint}) {
         </p>
 
         <p className="text-xs text-gray-400 mt-2">
-            {sprint.startDate} -→ {sprint.endDate}
+            {formatDate(sprint.startDate)} -→ {formatDate(sprint.endDate)}
         </p>
+
+        <p className="text-xs mt-2">
+            Status: <span className="font-semibold">{sprint.status}</span>
+        </p>
+
+        {/* Actions */}
+        <div className="flex gap-2 mt-3">
+        {sprint.status === "PLANNED" && (
+          <button
+            onClick={handleStart}
+            className="bg-green-500 text-white px-2 py-1 rounded"
+          >
+            Start
+          </button>
+        )}
+
+        {sprint.status === "ACTIVE" && (
+          <button
+            onClick={handleComplete}
+            className="bg-gray-700 text-white px-2 py-1 rounded"
+          >
+            Complete
+          </button>
+        )}
+
+        <button
+          onClick={handleDelete}
+          className="bg-red-500 text-white px-2 py-1 rounded"
+        >
+          Delete
+        </button>
         </div>
+    </div>
     );
 }

@@ -15,7 +15,7 @@ const router = Router();
 router.get("/sprint/:sprintId" , authenticate, getSprintFeatures);
 router.get("/single/:id", authenticate, getFeature);
 
-router.post("/", authenticate, createFeature);
+router.post("/:sprintId", authenticate, createFeature);
 router.get("/project/:projectId", authenticate, getProjectFeatures);
 
 router.patch('/:id', authenticate, updateFeature);

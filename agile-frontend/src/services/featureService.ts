@@ -6,7 +6,9 @@ export const createFeature = async (data: {
     sprintId: string;
 }) => {
     const res = await api.post(`/features/${data.sprintId}`, {
-        ...data,
+        title: data.title,
+        description: data.description || "",
+        sprint: data.sprintId,
         status: "planned", // default
     });
     return res.data;

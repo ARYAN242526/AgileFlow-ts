@@ -1,3 +1,4 @@
+import { useParams, useNavigate } from "react-router-dom";
 import type { Feature } from "../../types/feature";
 import { deleteFeature } from "../../services/featureService";
 
@@ -8,6 +9,9 @@ export default function FeatureCard({
   feature: Feature;
   refresh: () => void;
 }) {
+  const navigate = useNavigate();
+  const { projectId, sprintId} = useParams(); // get IDs from URL
+
   const handleDelete = async () => {
     await deleteFeature(feature._id);
     refresh();
@@ -41,6 +45,17 @@ export default function FeatureCard({
       <p className="text-xs text-gray-400 mt-2">
         Created: {new Date(feature.createdAt).toLocaleDateString()}
       </p>
+
+        <button
+        onClick={() =>
+          navigate(
+            `/projects/${projectId}/sprints/${sprintId}/features/${feature._id}/tasks`
+          )
+        }
+        className="bg-indigo-500 text-white px-3 py-1 rounded mt-3 w-full"
+      >
+        View Tasks
+      </button>
 
       {/* Actions */}
       <button

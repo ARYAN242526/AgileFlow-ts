@@ -1,4 +1,4 @@
-import { takeCoverage } from "node:v8";
+import { Feature } from "../models/feature.model";
 import { Task } from "../models/task.model";
 import { ApiError } from "../utils/ApiError";
 
@@ -6,8 +6,28 @@ export class TaskService {
 
     static async createTask(userId: string, data: any) {
 
+        const {title, description, feature, status} = data;
+
+        if (!title) {
+            throw new Error("Title is required");
+        }
+
+        if (!feature) {
+            throw new Error("Feature is required");
+        }
+        const featureDoc = await Feature.findById(feature);
+
+        if (!featureDoc) {
+            throw new Error("Feature not found");
+        }
+
         const task = await Task.create({
-            ...data,
+            title,
+            description,
+            feature,
+            sprint: featureDoc.sprint,
+            project: featureDoc.project,
+            status: status ||  "todo",
             createdBy: userId
         });
 

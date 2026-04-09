@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import TaskForm from "../../components/task/TaskForm";
-import TaskCard from "../../components/task/taskCard";
+import TaskCard from "../../components/task/TaskCard";
 import {
     getFeatureTasks,
     createTask,
@@ -11,13 +11,16 @@ import type { Task } from "../../types/task";
 
 
 export default function TasksPage() {
-    const {featureId} = useParams();
+    const {featureId, projectId} = useParams();
 
     const [tasks, setTasks] = useState<Task[]>([]);
 
     const fetchTasks = async () => {
         if(!featureId) return;
         const data = await getFeatureTasks(featureId);
+        console.log("Tasks: ", data);
+        console.log("Is Array: ", Array.isArray(data));
+        
         setTasks(data);
     };
 
@@ -29,14 +32,18 @@ export default function TasksPage() {
         title: string;
         description?: string;
     }) => {
-        if(!featureId) return;
+        if(!featureId || !projectId) return;
+
+        console.log("Crreating task for featureId: ", featureId);
+        
 
         await createTask({
             ...data,
             featureId,
+            projectId
         });
 
-        fetchTasks();
+        await fetchTasks();
     };
 
     const moveTask = async (taskId: string, status: Task["status"]) => {

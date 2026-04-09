@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Feature } from "../models/feature.model";
 import { Task } from "../models/task.model";
 import { ApiError } from "../utils/ApiError";
@@ -24,13 +25,15 @@ export class TaskService {
         const task = await Task.create({
             title,
             description,
-            feature,
+            feature: featureDoc._id,
             sprint: featureDoc.sprint,
             project: featureDoc.project,
             status: status ||  "todo",
             createdBy: userId
         });
 
+        console.log("creating task with feature: ", feature);
+        
         return task;
     }
 
@@ -42,6 +45,19 @@ export class TaskService {
 
         return tasks;            
     }
+
+    static async getFeatureTasks(featureId: string) {
+        console.log("FeatureId: ", featureId);
+        
+        const tasks = await Task
+            .find({ feature: new mongoose.Types.ObjectId(featureId)})
+            .populate("feature", "title");
+
+        console.log("Tasks found: ", tasks);
+        
+        return tasks;
+    }
+
 
     static async updateTask(taskId: string, data: any) {
 

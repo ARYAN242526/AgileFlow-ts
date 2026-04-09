@@ -2,6 +2,7 @@ import express from "express";
 import {
   createTask,
   getProjectTasks,
+  getFeatureTasks,
   updateTask,
   updateTaskStatus,
   deleteTask
@@ -32,6 +33,18 @@ router.get(
     ROLES.VIEWER
   ),
   getProjectTasks
+);
+
+router.get(
+  "/feature/:featureId",
+  authenticate,
+  authorizeRoles(
+    ROLES.ADMIN,
+    ROLES.PROJECT_MANAGER,
+    ROLES.DEVELOPER,
+    ROLES.VIEWER
+  ),
+  getFeatureTasks
 );
 
 /* Update task */

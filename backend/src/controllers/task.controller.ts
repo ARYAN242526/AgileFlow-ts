@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { TaskService } from "../services/task.service";
 import { ApiResponse } from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asyncHandler";
+import { log } from "node:console";
 
 export const createTask = asyncHandler(async (req: Request, res: Response) => {
 
@@ -23,6 +24,16 @@ export const getProjectTasks = asyncHandler(async (req: Request, res: Response) 
 
   res.status(200).json(
     new ApiResponse(200, tasks, "Tasks fetched")
+  );
+});
+
+export const getFeatureTasks = asyncHandler(async (req, res) => {
+  const {featureId} = req.params;
+
+  const tasks = await TaskService.getFeatureTasks(featureId as string);
+
+  res.status(200).json(
+    new ApiResponse(200, tasks, "Feature tasks fetched")
   );
 });
 

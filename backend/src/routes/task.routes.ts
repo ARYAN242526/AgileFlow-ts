@@ -24,7 +24,7 @@ router.post(
 
 /* View tasks */
 router.get(
-  "/feature/:featureId",
+  "/project/:projectId",
   authenticate,
   authorizeRoles(
     ROLES.ADMIN,

@@ -30,9 +30,7 @@ export class TaskService {
             project: featureDoc.project,
             status: status ||  "todo",
             createdBy: userId
-        });
-
-        console.log("creating task with feature: ", feature);
+        }); 
         
         return task;
     }
@@ -47,13 +45,10 @@ export class TaskService {
     }
 
     static async getFeatureTasks(featureId: string) {
-        console.log("FeatureId: ", featureId);
         
         const tasks = await Task
-            .find({ feature: new mongoose.Types.ObjectId(featureId)})
+            .find({ feature: featureId })
             .populate("feature", "title");
-
-        console.log("Tasks found: ", tasks);
         
         return tasks;
     }

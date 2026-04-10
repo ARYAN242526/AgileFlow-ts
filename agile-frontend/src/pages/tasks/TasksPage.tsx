@@ -18,13 +18,11 @@ export default function TasksPage() {
     const fetchTasks = async () => {
         if(!featureId) return;
         const data = await getFeatureTasks(featureId);
-        console.log("Tasks: ", data);
-        console.log("Is Array: ", Array.isArray(data));
-        
         setTasks(data);
     };
 
     useEffect(() => {
+        if(!featureId) return;
         fetchTasks();
     }, [featureId]);
 
@@ -32,10 +30,9 @@ export default function TasksPage() {
         title: string;
         description?: string;
     }) => {
-        if(!featureId || !projectId) return;
-
-        console.log("Crreating task for featureId: ", featureId);
-        
+        if(!featureId || !projectId){
+            return;
+        }
 
         await createTask({
             ...data,

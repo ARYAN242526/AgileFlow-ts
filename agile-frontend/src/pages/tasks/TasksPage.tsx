@@ -1,3 +1,4 @@
+import  {DndContext, DragEndEvent, useDroppable } from '@dnd-kit/core'
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import TaskForm from "../../components/task/TaskForm";
@@ -43,62 +44,78 @@ export default function TasksPage() {
         await fetchTasks();
     };
 
-    const moveTask = async (taskId: string, status: Task["status"]) => {
-        await updateTaskStatus(taskId, status);
-        fetchTasks();
+    const handleDragEnd = async (event: DragEndEvent) => {
+        const {active, over} = event;
+
+        if(!over) return;
+
+        const taskId = active.id as string;
+        const newStatus = over.id as Task["status"];
+        
+        const task = tasks.find((t) => t._id === taskId);
+        if(!task || task.status === newStatus) return;
+
+        setTasks((prev) => 
+            prev.map((t) => 
+                t._id === taskId ? {...t, status: newStatus} : t
+            )
+        );
+
+        // backend update
+        await updateTaskStatus(taskId, newStatus);
     };
+
 
     // group tasks based on status
     const todo = tasks.filter((t) => t.status === "todo");
     const inProgress = tasks.filter((t) => t.status === "in-progress");
     const done = tasks.filter((t) => t.status === "done");
 
+    function Column({
+        id,
+        title,
+        children,
+    }: {
+        id: Task["status"];
+        title: string;
+        children: React.ReactNode;
+    }) {
+        const {setNodeRef} = useDroppable({ id });
+
+        return (
+            <div ref={setNodeRef} className='bg-gray-100 p-3 rounded min-h-[300px]'>
+                <h3 className='font-bold mb-2'>{title}</h3>
+                {children}
+            </div>
+        );
+    }
+
     return (
         <div className="p-6">
             <TaskForm onCreate={handleCreate} />
 
-            <div className="grid grid-cols-3 gap-4">
+            <DndContext onDragEnd={handleDragEnd}>
+                <div className="grid grid-cols-3 gap-4">
 
-                {/* TODO */}
-                <div className="bg-gray-100 p-3 rounded">
-                    <h3 className="font-bold mb-2">TODO</h3>
-                    {todo.map((task) => (
-                        <div key={task._id}>
-                            <TaskCard task={task} refresh={fetchTasks} />
-                            <button
-                            onClick={() => moveTask(task._id, "in-progress")}
-                            className="text-blue-500 text-xs"
-                            >
-                                Move →
-                            </button>
-                        </div>
-                    ))}
+                <Column id='todo' title='TODO'>
+                {todo.map((task) => (
+                    <TaskCard key={task._id} task={task} refresh={fetchTasks} />
+                ))}
+                </Column>
+
+                <Column id='in-progress' title='IN PROGRESS'>
+                {inProgress.map((task) => (
+                    <TaskCard key={task._id} task={task} refresh={fetchTasks} />
+                ))}
+                </Column>
+
+                <Column id='done' title='DONE'>
+                {done.map((task) => (
+                    <TaskCard key={task._id} task={task} refresh={fetchTasks} />
+                ))}
+                </Column>
                 </div>
-
-                {/* IN PROGRESS */}
-                    <div className="bg-gray-100 p-3 rounded">
-                    <h3 className="font-bold mb-2">IN PROGRESS</h3>
-                    {inProgress.map((task) => (
-                        <div key={task._id}>
-                        <TaskCard task={task} refresh={fetchTasks} />
-                        <button
-                            onClick={() => moveTask(task._id, "done")}
-                            className="text-green-500 text-xs"
-                        >
-                            Move →
-                        </button>
-                        </div>
-                    ))}
-                    </div>
-
-                    {/* DONE */}
-                    <div className="bg-gray-100 p-3 rounded">
-                    <h3 className="font-bold mb-2">DONE</h3>
-                    {done.map((task) => (
-                        <TaskCard key={task._id} task={task} refresh={fetchTasks} />
-                    ))}
-                    </div>
-                </div>
+            </DndContext>
             </div>
     );
 }

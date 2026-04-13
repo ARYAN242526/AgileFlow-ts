@@ -25,6 +25,19 @@ export default function TaskCard({
         refresh();
     };
 
+    const getPriorityColor = (priority: Task["priority"]) => {
+        switch(priority) {
+            case "low" :
+                return "bg-green-100 text-green-700";
+            case "medium" :
+                return "bg-yellow-100 text-yellow-700";
+            case "high" :
+                return "bg-red-100 text-gray-700";
+            default: 
+            return "bg-gray-100 text-gray-700";
+        }
+    };
+
     return (
         <div
             ref={setNodeRef}
@@ -42,12 +55,18 @@ export default function TaskCard({
 
         <p className="text-xs text-gray-500">{task.description}</p>
 
+        <span
+            className={`inline-block px-2 py-1 text-xs rounded mt-2 ${getPriorityColor(task.priority)}`}
+        >
+            {task.priority.toUpperCase()}
+        </span>
+
             <button
             onClick={(e) => {
                 e.stopPropagation();
                 handleDelete();
             }}
-            className="text-red-500 text-xs mt-2"
+            className="block text-red-500 text-xs mt-2"
             >
                 Delete
             </button>

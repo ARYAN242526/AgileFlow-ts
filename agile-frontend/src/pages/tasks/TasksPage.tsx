@@ -30,6 +30,7 @@ export default function TasksPage() {
     const handleCreate = async (data: {
         title: string;
         description?: string;
+        priority: Task["priority"];
     }) => {
         if(!featureId || !projectId){
             return;
@@ -38,7 +39,8 @@ export default function TasksPage() {
         await createTask({
             ...data,
             featureId,
-            projectId
+            projectId,
+            
         });
 
         await fetchTasks();

@@ -10,12 +10,14 @@ export const createTask = async (data: {
     description?: string;
     featureId: string;
     projectId: string;
+    priority: "low" | "medium" | "high";
 }) => {
     const res = await api.post(`/tasks`, {
         title: data.title,
         description: data.description || "",
         feature: data.featureId,
         project: data.projectId,
+        priority: data.priority,
         status: "todo",
     });
     return res.data;

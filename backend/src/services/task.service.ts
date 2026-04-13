@@ -7,7 +7,7 @@ export class TaskService {
 
     static async createTask(userId: string, data: any) {
 
-        const {title, description, feature, status} = data;
+        const {title, description, feature, status, priority} = data;
 
         if (!title) {
             throw new Error("Title is required");
@@ -25,6 +25,7 @@ export class TaskService {
         const task = await Task.create({
             title,
             description,
+            priority,
             feature: featureDoc._id,
             sprint: featureDoc.sprint,
             project: featureDoc.project,

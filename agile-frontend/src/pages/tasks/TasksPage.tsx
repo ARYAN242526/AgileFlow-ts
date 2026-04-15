@@ -15,12 +15,22 @@ export default function TasksPage() {
     const {featureId, projectId} = useParams();
 
     const [tasks, setTasks] = useState<Task[]>([]);
+    const [completion, setCompletion] = useState(0);
 
     const fetchTasks = async () => {
         if(!featureId) return;
         const data = await getFeatureTasks(featureId);
-        setTasks(data);
+
+        setTasks(data.tasks);
+        setCompletion(data.completion);
     };
+
+    const calculateCompletion = (tasks: Task[]) => {
+            const total = tasks.length;
+            const done = tasks.filter(t => t.status === "done").length;
+
+            return total === 0 ? 0 : Math.round((done / total) * 100);
+        };    
 
     useEffect(() => {
         if(!featureId) return;
@@ -57,14 +67,19 @@ export default function TasksPage() {
         const task = tasks.find((t) => t._id === taskId);
         if(!task || task.status === newStatus) return;
 
-        setTasks((prev) => 
-            prev.map((t) => 
-                t._id === taskId ? {...t, status: newStatus} : t
-            )
+        setTasks((prev) => {
+            const updated = prev.map((t) => 
+            t._id === taskId ? {...t, status: newStatus} : t
         );
+
+        setCompletion(calculateCompletion(updated));
+
+        return updated;
+    });
 
         // backend update
         await updateTaskStatus(taskId, newStatus);
+        await fetchTasks();        
     };
 
 
@@ -92,9 +107,25 @@ export default function TasksPage() {
         );
     }
 
+      
+
     return (
         <div className="p-6">
             <TaskForm onCreate={handleCreate} />
+
+              <div className="mb-4">
+                <div className="flex justify-between text-sm mb-1">
+                    <span className="font-medium">Feature Progress</span>
+                    <span>{completion}%</span>
+            </div>
+
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                <div
+                    className="bg-green-500 h-3 rounded-full transition-all"
+                    style={{ width: `${completion}%` }}
+                ></div>
+            </div>
+        </div>
 
             <DndContext onDragEnd={handleDragEnd}>
                 <div className="grid grid-cols-3 gap-4">

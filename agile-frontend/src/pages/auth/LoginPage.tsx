@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/authService";
+import { useAuth } from "../../context/AuthContext";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const {login} = useAuth();
 
   const [form, setForm] = useState({
     email: "",
@@ -24,12 +26,17 @@ export default function LoginPage() {
       setLoading(true);
       setError("");
 
-      const data = await loginUser(form);
+      const res = await loginUser(form);
 
-      console.log("Login success:", data);
+      console.log("Login success:", res);
 
-      // ✅ redirect after login
-      navigate("/dashboard");
+      if(res.success) {
+        // use context login
+        login(res.data.accessToken, res.data.user);
+
+        // redirect
+        navigate("/dashboard");
+      }
 
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed");

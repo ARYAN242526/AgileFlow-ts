@@ -50,8 +50,16 @@ export class TaskService {
         const tasks = await Task
             .find({ feature: featureId })
             .populate("feature", "title");
+
+        const total = tasks.length;
+        const completed = tasks.filter(t => t.status === "done").length;
+
+        const completion = total === 0 ? 0 : Math.round((completed / total) * 100);
         
-        return tasks;
+        return {
+            tasks,
+            completion
+        };
     }
 
 

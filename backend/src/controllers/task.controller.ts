@@ -29,10 +29,10 @@ export const getProjectTasks = asyncHandler(async (req: Request, res: Response) 
 export const getFeatureTasks = asyncHandler(async (req, res) => {
   const {featureId} = req.params;
   
-  const tasks = await TaskService.getFeatureTasks(featureId as string);
+  const result = await TaskService.getFeatureTasks(featureId as string);
 
   res.status(200).json(
-    new ApiResponse(200, tasks, "Feature tasks fetched")
+    new ApiResponse(200, result, "Feature tasks fetched")
   );
 });
 

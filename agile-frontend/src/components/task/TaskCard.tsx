@@ -16,60 +16,47 @@ export default function TaskCard({
 
     const style = {
         transform: transform
-            ? `translate(${transform.x}px, ${transform.y}px)`
+            ? `translate3d(${transform.x}px, ${transform.y}px)`
             : undefined,
     };
 
-    const handleDelete = async () => {
+    const handleDelete = async (e: React.MouseEvent) => {
+        e.stopPropagation();
         await deleteTask(task._id);
         refresh();
     };
 
-    const getPriorityColor = (priority: Task["priority"]) => {
-        switch(priority) {
-            case "low" :
-                return "bg-green-100 text-green-700";
-            case "medium" :
-                return "bg-yellow-100 text-yellow-700";
-            case "high" :
-                return "bg-red-100 text-gray-700";
-            default: 
-            return "bg-gray-100 text-gray-700";
-        }
-    };
-
-    return (
+     return (
         <div
-            ref={setNodeRef}
-            style={style}
-            className="bg-white p-3 rounded shadow-md"
-        >
-         {/* Drag handle */}
-            <div
-                {...listeners}
-                {...attributes}
-                className="cursor-grab active:cursor-grabbing font-semibold"
-            >
-                {task.title}
-        </div>
+        ref={setNodeRef}
+        style={style}
+        {...listeners}
+        {...attributes}
+        className="bg-white p-4 rounded-xl shadow-sm border hover:shadow-md transition cursor-grab active:cursor-grabbing"
+    >
+      <h4 className="font-semibold text-gray-800">{task.title}</h4>
 
-        <p className="text-xs text-gray-500">{task.description}</p>
+      <p className="text-xs text-gray-500 mt-1">{task.description}</p>
 
-        <span
-            className={`inline-block px-2 py-1 text-xs rounded mt-2 ${getPriorityColor(task.priority)}`}
-        >
-            {task.priority.toUpperCase()}
-        </span>
+      {/* 🔥 Priority Badge */}
+      <span
+        className={`inline-block mt-2 text-xs px-2 py-1 rounded-full ${
+          task.priority === "high"
+            ? "bg-red-100 text-red-600"
+            : task.priority === "medium"
+            ? "bg-yellow-100 text-yellow-600"
+            : "bg-green-100 text-green-600"
+        }`}
+      >
+        {task.priority}
+      </span>
 
-            <button
-            onClick={(e) => {
-                e.stopPropagation();
-                handleDelete();
-            }}
-            className="block text-red-500 text-xs mt-2"
-            >
-                Delete
-            </button>
-        </div>
-    )
+      <button
+        onClick={handleDelete}
+        className="block mt-3 text-xs text-red-500 hover:underline"
+      >
+        Delete
+      </button>
+    </div>
+  );
 }

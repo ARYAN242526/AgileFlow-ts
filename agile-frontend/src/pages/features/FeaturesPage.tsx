@@ -15,11 +15,20 @@ export default function FeaturesPage() {
   const { sprintId } = useParams();
 
   const [features, setFeatures] = useState<Feature[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchFeatures = async () => {
     if (!sprintId) return;
-    const data = await getSprintFeatures(sprintId);
-    setFeatures(data);
+
+    try {
+      setLoading(true);
+      const data = await getSprintFeatures(sprintId);
+      setFeatures(data);
+    } catch (err) {
+      console.error("Error fetching features", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -41,24 +50,62 @@ export default function FeaturesPage() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-gray-50 min-h-screen">
 
-      <h1 className="text-2xl font-bold mb-4">Features</h1>
+      {/* 🔥 HEADER */}
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">
+            Sprint Features 🚀
+          </h1>
+          <p className="text-gray-500 text-sm">
+            Organize work into features and track progress
+          </p>
+        </div>
 
-      {/* Create */}
-      <FeatureForm onCreate={handleCreate} />
+        <div className="bg-white px-4 py-2 rounded-xl shadow text-sm">
+          Total Features: <span className="font-semibold">{features.length}</span>
+        </div>
+      </div>
 
-      {/* List */}
-      {features.length === 0 ? (
-        <p className="text-gray-500">No features yet</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* 🔥 CREATE FEATURE CARD */}
+      <div className="mb-6 bg-white p-5 rounded-2xl shadow">
+        <h2 className="text-lg font-semibold mb-3 text-gray-700">
+          Create New Feature
+        </h2>
+        <FeatureForm onCreate={handleCreate} />
+      </div>
+
+      {/* 🔥 LOADING */}
+      {loading && (
+        <p className="text-gray-500 text-center">Loading features...</p>
+      )}
+
+      {/* 🔥 EMPTY STATE */}
+      {!loading && features.length === 0 && (
+        <div className="text-center py-16 bg-white rounded-2xl shadow">
+          <h3 className="text-lg font-semibold text-gray-700">
+            No features yet 😕
+          </h3>
+          <p className="text-gray-500 text-sm mt-2">
+            Start by creating your first feature
+          </p>
+        </div>
+      )}
+
+      {/* 🔥 FEATURES GRID */}
+      {features.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {features.map((feature) => (
-            <FeatureCard
+            <div
               key={feature._id}
-              feature={feature}
-              refresh={fetchFeatures}
-            />
+              className="transition-transform hover:scale-[1.02]"
+            >
+              <FeatureCard
+                feature={feature}
+                refresh={fetchFeatures}
+              />
+            </div>
           ))}
         </div>
       )}

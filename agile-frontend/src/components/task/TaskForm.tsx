@@ -41,7 +41,7 @@ export default function TaskForm({
             />
 
             <select
-                className="border p-2 mr-2"
+                className="border p-2 mr-2 rounded"
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as any)}
             >

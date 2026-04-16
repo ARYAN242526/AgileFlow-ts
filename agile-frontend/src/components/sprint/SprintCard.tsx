@@ -82,7 +82,9 @@ export default function SprintCard({
         </div>
         <button
             onClick={() =>
-            navigate(`/projects/${projectId}/sprints/${sprint._id}/features`)
+            navigate(`/projects/${projectId}/sprints/${sprint._id}/features`, {
+              state: {refresh: true}
+            })
             }
             className="bg-indigo-500 text-white px-3 py-1 rounded mt-4 w-full"
         >

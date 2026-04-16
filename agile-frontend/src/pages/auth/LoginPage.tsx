@@ -28,7 +28,6 @@ export default function LoginPage() {
 
       const res = await loginUser(form);
 
-      console.log("Login success:", res);
 
       if(res.success) {
         // use context login

@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { Feature } from "../models/feature.model";
 import { Task } from "../models/task.model";
 import { ApiError } from "../utils/ApiError";
@@ -31,7 +30,9 @@ export class TaskService {
             project: featureDoc.project,
             status: status ||  "todo",
             createdBy: userId
-        }); 
+        });
+
+        await this.updateFeatureStatus(featureDoc._id.toString());
         
         return task;
     }
@@ -84,6 +85,8 @@ export class TaskService {
         if(!task) {
             throw new ApiError(404, "Task not found");
         }
+
+        await this.updateFeatureStatus(task.feature.toString());
     }
 
     static async updateStatus(taskId: string, status: string) {
@@ -94,9 +97,34 @@ export class TaskService {
         }
 
         task.status = status as any;
-
         await task.save();
+
+        await this.updateFeatureStatus(task.feature.toString());
 
         return task;
     }
+
+    static async updateFeatureStatus(featureId: string) {
+        const tasks = await Task.find({ feature: featureId });
+
+        if (tasks.length === 0) {
+            await Feature.findByIdAndUpdate(featureId, { status: "planned" });
+            return;
+        }
+
+        const doneCount = tasks.filter(t => t.status === "done").length;
+
+        let status: "planned" | "in-progress" | "done" = "planned";
+
+        if (doneCount === 0) {
+            status = "planned";
+        } else if (doneCount === tasks.length) {
+            status = "done";
+        } else {
+            status = "in-progress";
+        }
+
+        await Feature.findByIdAndUpdate(featureId, { status });
+    }
+
 }

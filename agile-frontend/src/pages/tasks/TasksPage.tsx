@@ -82,10 +82,15 @@ export default function TasksPage() {
         setTasks(updatedTasks);
         setCompletion(calculateCompletion(updatedTasks));
 
-        updateTaskStatus(taskId, newStatus).catch(() => {
+        try {
+            await updateTaskStatus(taskId, newStatus);
+        } catch (err) {
+            console.log("API FAILED", err);
+
+            // rollback UI
             setTasks(tasks);
             setCompletion(calculateCompletion(tasks));
-        });
+        }
     };
 
     // group tasks based on status

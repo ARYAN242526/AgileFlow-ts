@@ -50,7 +50,6 @@ export const updateTask = asyncHandler(async (req: Request, res: Response) => {
 
 
 export const updateTaskStatus = asyncHandler(async (req: Request, res: Response) => {
-
   const { id } = req.params;
   const { status } = req.body;
 

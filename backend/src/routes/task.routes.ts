@@ -35,6 +35,18 @@ router.get(
   getProjectTasks
 );
 
+/* Update status */
+router.patch(
+  "/:id/status",
+  authenticate,
+  authorizeRoles(
+    ROLES.ADMIN,
+    ROLES.PROJECT_MANAGER,
+    ROLES.DEVELOPER
+  ),
+  updateTaskStatus
+);
+
 router.get(
   "/feature/:featureId",
   authenticate,
@@ -59,17 +71,7 @@ router.patch(
   updateTask
 );
 
-/* Update status */
-router.patch(
-  "/status/:id",
-  authenticate,
-  authorizeRoles(
-    ROLES.ADMIN,
-    ROLES.PROJECT_MANAGER,
-    ROLES.DEVELOPER
-  ),
-  updateTaskStatus
-);
+
 
 /* Delete task */
 router.delete(

@@ -1,3 +1,4 @@
+import { log } from "node:console";
 import { Feature } from "../models/feature.model";
 import { Task } from "../models/task.model";
 import { ApiError } from "../utils/ApiError";
@@ -6,7 +7,7 @@ export class TaskService {
 
     static async createTask(userId: string, data: any) {
 
-        const {title, description, feature, status, priority} = data;
+        const {title, description, feature, status, assignee, priority} = data;
 
         if (!title) {
             throw new Error("Title is required");
@@ -25,6 +26,7 @@ export class TaskService {
             title,
             description,
             priority,
+            assignee: assignee || null,
             feature: featureDoc._id,
             sprint: featureDoc.sprint,
             project: featureDoc.project,
@@ -40,7 +42,7 @@ export class TaskService {
     static async getProjectTasks(projectId: string) {
         const tasks = await Task
                 .find({ project: projectId })
-                .populate("assignee", "name email")
+                .populate("assignee", "name email avatar")
                 .populate("feature", "title");
 
         return tasks;            
@@ -50,7 +52,9 @@ export class TaskService {
         
         const tasks = await Task
             .find({ feature: featureId })
-            .populate("feature", "title");
+            .populate("feature", "title")
+            .populate("assignee", "name avatar");
+
 
         const total = tasks.length;
         const completed = tasks.filter(t => t.status === "done").length;

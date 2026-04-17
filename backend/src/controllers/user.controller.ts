@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { UserService } from "../services/user.service";
 import { ApiResponse } from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asyncHandler";
+import { User } from "../models/user.model";
 
 export const getCurrentUser = asyncHandler(async (req: Request, res: Response) => {
 
@@ -47,3 +48,11 @@ export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
             .status(200)
             .json(new ApiResponse(200, {}, "User deleted successfully"));
 });
+
+export const getUsers = asyncHandler(async (req, res) => {
+    const users = await User.find().select("name email avatar");
+
+    return res
+            .status(200)
+            .json(new ApiResponse(200, users, "Users Fetched"));
+})

@@ -4,7 +4,8 @@ import {
     getCurrentUser,
     updateProfile,
     changePassword,
-    deleteUser
+    deleteUser,
+    getUsers
 } from "../controllers/user.controller";
 
 const router = Router();
@@ -12,6 +13,8 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/me', getCurrentUser);
+
+router.get("/", getUsers);
 
 router.patch('/update-profile', updateProfile);
 

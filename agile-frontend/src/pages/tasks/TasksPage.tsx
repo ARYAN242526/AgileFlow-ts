@@ -48,6 +48,7 @@ export default function TasksPage() {
         title: string;
         description?: string;
         priority: Task["priority"];
+        assignee?: string;
     }) => {
         if(!featureId || !projectId){
             return;
@@ -55,9 +56,8 @@ export default function TasksPage() {
 
         await createTask({
             ...data,
-            featureId,
-            projectId,
-            
+            featureId: featureId,
+            projectId: projectId,
         });
 
         await fetchTasks();

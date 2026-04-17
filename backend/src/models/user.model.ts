@@ -7,6 +7,7 @@ export interface IUser extends Document {
     email: string
     password: string
     role: ROLES;
+    avatar?: string;
     refreshToken?: string | null
     comparePassword(password: string): Promise<boolean>
 }
@@ -33,6 +34,12 @@ const userSchema = new Schema<IUser>(
             type: String,
             enum: Object.values(ROLES),
             default: ROLES.DEVELOPER
+        },
+        avatar: {
+            type: String,
+            default: function () {
+                return `https://ui-avatars.com/api/?name=${this.name}&background=random`;
+            },
         },
         refreshToken: {
             type: String,

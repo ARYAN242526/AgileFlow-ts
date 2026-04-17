@@ -7,6 +7,11 @@ export interface Task {
     description?: string;
     status: TASK_STATUS;
     priority: PRIORITY;
+    assignee?: {
+        _id: string;
+        name: string;
+        avatar: string;
+    };
     feature: string;
     sprint: string;
     project: string;

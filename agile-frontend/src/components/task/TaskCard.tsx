@@ -38,6 +38,20 @@ export default function TaskCard({
 
       <p className="text-xs text-gray-500 mt-1">{task.description}</p>
 
+      {task.assignee && (
+        <div className="flex items-center gap-2 mt-2">
+          <img
+            src={task.assignee.avatar}
+            alt={task.assignee.name}
+            className="w-6 h-6 rounded-full border"
+          />
+          <span className="text-xs text-gray-600">
+            {task.assignee.name}
+          </span>
+
+        </div>
+      )}
+
       {/* 🔥 Priority Badge */}
       <span
         className={`inline-block mt-2 text-xs px-2 py-1 rounded-full ${

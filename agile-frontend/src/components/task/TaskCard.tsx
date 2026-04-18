@@ -1,6 +1,9 @@
 import { useDraggable } from "@dnd-kit/core";
+import { useEffect, useState } from "react";
 import type { Task } from "../../types/task";
-import { deleteTask } from "../../services/taskService";
+import { deleteTask, updateTaskAssignee } from "../../services/taskService";
+import { getUsers } from "../../services/userService";
+
 
 export default function TaskCard({
     task,
@@ -20,6 +23,30 @@ export default function TaskCard({
             : undefined,
     };
 
+    // assignee state
+    const [showUsers, setShowUsers] = useState(false);
+    const [users, setUsers] = useState<any[]>([]);
+    const [currentAssignee, setCurrentAssignee] = useState(task.assignee);
+
+      useEffect(() => {
+        const fetchUsers = async () => {
+          const data = await getUsers();
+          setUsers(data);
+        };
+        fetchUsers();
+    }, []);
+
+      const handleAssign = async (user: any) => {
+        setCurrentAssignee(user); // optimistic UI
+        setShowUsers(false);
+
+        try {
+          await updateTaskAssignee(task._id, user._id);
+        } catch {
+          refresh(); // fallback
+        }
+      };
+
     const handleDelete = async (e: React.MouseEvent) => {
         e.stopPropagation();
         await deleteTask(task._id);
@@ -32,25 +59,66 @@ export default function TaskCard({
         style={style}
         {...listeners}
         {...attributes}
-        className="bg-white p-4 rounded-xl shadow-sm border hover:shadow-md transition cursor-grab active:cursor-grabbing"
+        className="bg-white p-4 rounded-xl shadow-sm border hover:shadow-md transition cursor-grab active:cursor-grabbing relative"
     >
       <h4 className="font-semibold text-gray-800">{task.title}</h4>
 
       <p className="text-xs text-gray-500 mt-1">{task.description}</p>
 
-      {task.assignee && (
-        <div className="flex items-center gap-2 mt-2">
-          <img
-            src={task.assignee.avatar}
-            alt={task.assignee.name}
-            className="w-6 h-6 rounded-full border"
-          />
-          <span className="text-xs text-gray-600">
-            {task.assignee.name}
-          </span>
+      <div className="mt-2 relative">
+        {currentAssignee ? (
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation(); // ❗ prevent drag
+              setShowUsers(!showUsers);
+            }}
+          >
+            <img
+              src={currentAssignee.avatar}
+              alt={currentAssignee.name}
+              className="w-6 h-6 rounded-full border"
+            />
+            <span className="text-xs text-gray-600">
+              {currentAssignee.name}
+            </span>
+          </div>
+        ) : (
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowUsers(!showUsers);
+            }}
+            className="text-xs text-gray-400 cursor-pointer"
+          >
+            Assign user
+          </div>
+        )}
 
-        </div>
-      )}
+        {/* 🔥 Dropdown */}
+        {showUsers && (
+          <div
+            className="absolute z-10 bg-white border shadow-md rounded mt-2 w-40"
+            onClick={(e) => e.stopPropagation()} // ❗ prevent drag
+          >
+            {users.map((u) => (
+              <div
+                key={u._id}
+                onClick={() => handleAssign(u)}
+                className={`flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100 ${
+                  currentAssignee?._id === u._id ? "bg-blue-50" : ""
+                }`}
+              >
+                <img
+                  src={u.avatar}
+                  className="w-5 h-5 rounded-full"
+                />
+                <span className="text-xs">{u.name}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* 🔥 Priority Badge */}
       <span

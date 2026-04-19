@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage from '../pages/home/HomePage';
 import LoginPage from '../pages/auth/LoginPage';
 import RegisterPage from '../pages/auth/RegisterPage';
-import DashBoardPage from '../pages/dashboard/DashboardPage';
+import DashboardPage from '../pages/dashboard/DashboardPage';
 import ProjectsPage from '../pages/projects/ProjectsPage';
 import ProjectDetailsPage from '../pages/projects/ProjectDetailsPage';
 
@@ -28,7 +28,7 @@ export default function AppRoutes() {
             path='/dashboard'
             element={
             <ProtectedRoute>
-                <DashBoardPage />
+                <DashboardPage />
             </ProtectedRoute>
             }
             />

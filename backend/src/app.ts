@@ -8,6 +8,7 @@ import projectRoutes from './routes/project.routes';
 import sprintRoutes from './routes/sprint.routes';
 import featureRoutes from './routes/feature.routes';
 import taskRoutes from './routes/task.routes';
+import dashboardRoutes from './routes/dashboard.routes'
 
 const app = express();
 
@@ -34,5 +35,6 @@ app.use("/api/v1/projects" , projectRoutes);
 app.use("/api/v1/sprints", sprintRoutes);
 app.use("/api/v1/features", featureRoutes);
 app.use("/api/v1/tasks", taskRoutes);
+app.use("/api/v1/dashboard", dashboardRoutes)
 
 export default app;

@@ -1,11 +1,10 @@
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import { Outlet } from "react-router-dom";
 
-export default function MainLayout({ 
-    children,
-}: { children: React.ReactNode}) {
+export default function MainLayout() {
     return (
-    <div className="flex h-screen bg-slate-100">
+    <div className="flex h-screen bg-gray-50">
         {/* Sidebar */}
         <Sidebar />
 
@@ -15,9 +14,9 @@ export default function MainLayout({
             <Navbar />
 
         {/* Content */}
-        <main className="flex-1 p-6 overflow-y-auto">
-            {children}
-        </main>
+        <div className="p-6 overflow-y-auto flex-1">
+            <Outlet />
+            </div>
         </div>
     </div>
     );

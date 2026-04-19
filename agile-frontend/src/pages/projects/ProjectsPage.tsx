@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import MainLayout from "../../components/layout/MainLayout";
 import ProjectCard from "../../components/project/ProjectCard";
 import ProjectForm from "../../components/project/ProjectForm";
 import { getProjects, createProject } from "../../services/projectService";
@@ -36,8 +35,8 @@ export default function ProjectsPage() {
   };
 
   return (
-    <MainLayout>
-      <h1 className="text-2xl font-bold mb-6">Projects</h1>
+    <>
+     <h1 className="text-2xl font-bold mb-6">Projects</h1>
 
       {/* Create Project */}
       <div className="mb-6">
@@ -50,6 +49,6 @@ export default function ProjectsPage() {
           <ProjectCard key={project._id} project={project} />
         ))}
     </div>
-    </MainLayout>
+    </>
   )
 }

@@ -1,85 +1,54 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import HomePage from '../pages/home/HomePage';
-import LoginPage from '../pages/auth/LoginPage';
-import RegisterPage from '../pages/auth/RegisterPage';
-import DashboardPage from '../pages/dashboard/DashboardPage';
-import ProjectsPage from '../pages/projects/ProjectsPage';
-import ProjectDetailsPage from '../pages/projects/ProjectDetailsPage';
+import HomePage from "../pages/home/HomePage";
+import LoginPage from "../pages/auth/LoginPage";
+import RegisterPage from "../pages/auth/RegisterPage";
 
-import ProtectedRoute from './ProtectedRoute';
-import RoleProtectedRoute from './RoleProtectedRoute';
-import FeaturesPage from '../pages/features/FeaturesPage';
-import TasksPage from '../pages/tasks/TasksPage';
-import SprintsPage from '../pages/sprints/SprintsPage';
+import DashboardPage from "../pages/dashboard/DashboardPage";
+import ProjectsPage from "../pages/projects/ProjectsPage";
+import ProjectDetailsPage from "../pages/projects/ProjectDetailsPage";
+import SprintsPage from "../pages/sprints/SprintsPage";
+import FeaturesPage from "../pages/features/FeaturesPage";
+import TasksPage from "../pages/tasks/TasksPage";
 
+import ProtectedRoute from "./ProtectedRoute";
+import RoleProtectedRoute from "./RoleProtectedRoute";
+import MainLayout from "../components/layout/MainLayout";
 
 export default function AppRoutes() {
-    return (
-        <BrowserRouter>
-        <Routes>
-            {/*  Public  */}
-            <Route path='/' element={<HomePage />} />
-            <Route path='/login' element={<LoginPage/>} />
-            <Route path='/register' element={<RegisterPage />} />
+  return (
+    <BrowserRouter>
+      <Routes>
 
-            {/* Protected */}
-            <Route 
-            path='/dashboard'
-            element={
-            <ProtectedRoute>
-                <DashboardPage />
-            </ProtectedRoute>
-            }
-            />
+        {/* Public */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
-            {/* Role- based */}
-            <Route 
-            path='/projects' 
-            element={
-            <RoleProtectedRoute allowedRoles={["Admin" , "ProjectManager"]}>
-                <ProjectsPage />
-            </RoleProtectedRoute>
-            }
-            />
+        {/* 🔐 Protected */}
+        <Route element={<ProtectedRoute />}>
+          
+          {/* Layout wrapper */}
+          <Route element={<MainLayout />}>
 
-            <Route  
-            path='/projects/:projectId'
-            element={
-                <ProtectedRoute>
-                    <ProjectDetailsPage />
-                </ProtectedRoute>
-            }
-            
-            />
+            {/* Dashboard */}
+            <Route path="/dashboard" element={<DashboardPage />} />
 
-            <Route
-            path="/projects/:projectId/sprints"
-            element={
-                <ProtectedRoute>
-                    <SprintsPage />
-                </ProtectedRoute>
-            }
-            />
+            {/* Role-based routes */}
+            <Route element={<RoleProtectedRoute allowedRoles={["Admin", "ProjectManager"]} />}>
+              <Route path="/projects" element={<ProjectsPage />} />
+            </Route>
 
-            <Route
-            path="/projects/:projectId/sprints/:sprintId/features"
-            element={
-                <ProtectedRoute>
-                    <FeaturesPage />
-                </ProtectedRoute>
-            }
-            />
+            {/* Other routes */}
+            <Route path="/projects/:projectId" element={<ProjectDetailsPage />} />
+            <Route path="/projects/:projectId/sprints" element={<SprintsPage />} />
+            <Route path="/projects/:projectId/sprints/:sprintId/features" element={<FeaturesPage />} />
+            <Route path="/projects/:projectId/sprints/:sprintId/features/:featureId/tasks" element={<TasksPage />} />
 
-            <Route
-            path="/projects/:projectId/sprints/:sprintId/features/:featureId/tasks"
-            element={
-                <ProtectedRoute>
-                    <TasksPage />
-                </ProtectedRoute>
-            }
-            />
-        </Routes>
-        </BrowserRouter>
-    );
+          </Route>
+        </Route>
+
+      </Routes>
+    </BrowserRouter>
+  );
 }

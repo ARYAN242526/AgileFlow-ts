@@ -1,4 +1,5 @@
 import { Project } from "../models/project.model";
+import { User } from "../models/user.model";
 import { ApiError } from "../utils/ApiError";
 
 export class ProjectService {
@@ -6,7 +7,10 @@ export class ProjectService {
     static async createProject(userId: string, data: any) {
         const project = await Project.create({
             ...data,
-            owner: userId
+            owner: userId,
+            members: [
+                {user: userId, role: "Admin"}
+            ]
         });
 
         return project;
@@ -14,11 +18,35 @@ export class ProjectService {
     
     static async getUserProjects(userId: string) {
         const projects = await Project
-                .find({owner: userId})
+                .find({
+                    $or: [
+                        { owner: userId },
+                        { "members.user": userId }
+                    ]
+                })
                 .populate("owner", "name email")
+                .populate("members.user", "name email avatar")
                 .sort({ createdAt: -1 });
 
         return projects;
+    }
+
+    static async addMemberByEmail(projectId: string, email: string) {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        return await Project.findByIdAndUpdate(
+            projectId,
+            {
+            $addToSet: {
+                members: { user: user._id, role: "Member" }
+            }
+            },
+            { returnDocument : "after" }
+        ).populate("members.user", "name email avatar");
     }
 
     static async getProjectById(projectId: string) {

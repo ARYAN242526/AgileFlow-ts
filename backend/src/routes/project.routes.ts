@@ -7,7 +7,8 @@ import {
     getProjects,
     getProject,
     updateProject,
-    deleteProject
+    deleteProject,
+    addMember
 } from "../controllers/project.controller";
 
 const router = Router();
@@ -18,6 +19,12 @@ router.post(
     '/',
     authorizeRoles(ROLES.ADMIN, ROLES.PROJECT_MANAGER),
     createProject
+);
+
+router.post(
+    "/:projectId/members",
+    authorizeRoles(ROLES.ADMIN, ROLES.PROJECT_MANAGER),
+    addMember
 );
 
 router.get(

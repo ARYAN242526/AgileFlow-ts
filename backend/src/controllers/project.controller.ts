@@ -25,6 +25,17 @@ export const getProjects = asyncHandler(async (req: Request, res: Response) => {
             .json(new ApiResponse(200, projects, "Projects fetched"));
 });
 
+export const addMember = asyncHandler(async (req: Request, res: Response) => {
+    const {projectId} = req.params;
+    const {email} = req.body;
+
+    const project = await ProjectService.addMemberByEmail(projectId as string, email);
+
+    return res
+            .status(200)
+            .json(new ApiResponse(200, project, "Member added successfuly"));
+});
+
 export const getProject = asyncHandler(async (req: Request, res: Response) => {
 
     const {id} = req.params;

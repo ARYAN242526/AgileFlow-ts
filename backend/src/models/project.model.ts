@@ -5,6 +5,10 @@ export interface IProject extends Document {
     name: string;
     description?: string;
     owner: Types.ObjectId;
+    members: {
+        user: Types.ObjectId;
+        role: "Admin" | "Member";
+    }[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -23,7 +27,20 @@ const projectSchema = new mongoose.Schema<IProject>(
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true
-        }
+        },
+        members: [
+            {
+                user: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "User",
+                },
+                role: {
+                    type: String,
+                    enum: ["Admin", "Member"],
+                    default: "Member",
+                },
+            },
+        ],
     },
     {
         timestamps: true

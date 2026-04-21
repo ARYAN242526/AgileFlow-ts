@@ -1,31 +1,38 @@
 import { useAuth } from "../../context/AuthContext";
 
 export default function Navbar() {
-    const {user} = useAuth();
+  const { user } = useAuth();
 
-    return (
-        <div className="h-16 bg-white border-b flex items-center justify-between px-6">
+  return (
+    <div className="h-16 bg-white border-b flex items-center justify-end px-6">
+
+      {/* User Avatar + Hover Info */}
+      <div className="relative group cursor-pointer">
         
-        {/* Search */}
-        <input
-        type="text"
-        placeholder="Search..."
-        className="bg-gray-100 px-4 py-2 rounded-md outline-none w-64"
+        {/* Avatar */}
+        <img
+          src={
+            user?.avatar ||
+            `https://ui-avatars.com/api/?name=${user?.email || "User"}`
+          }
+          alt="user"
+          className="w-9 h-9 rounded-full border shadow-sm"
         />
 
-        {/* Right Side */}
-        <div className="flex items-center gap-4">
-            {/* Notification */}
-        <span className="text-xl cursor-pointer">🔔</span>
+        {/* Hover Card */}
+        <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg p-3 
+                        opacity-0 group-hover:opacity-100 transition duration-200 z-50">
 
-        {/* User */}
-        <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-            <span className="text-sm font-medium">
-                {user?.email || "User"}
-            </span>
+          <p className="text-sm font-medium text-gray-800 truncate">
+            {user?.email || "User"}
+          </p>
+
+          <p className="text-xs text-gray-400 mt-1">
+            {user?.role || "Member"}
+          </p>
+
         </div>
+      </div>
     </div>
-</div>
-    );
+  );
 }

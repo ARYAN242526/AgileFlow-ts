@@ -16,11 +16,15 @@ export default function ProjectCard({ project } : { project: Project}) {
                 {project.description}
             </p>
 
-            <div className="mt-4">
-                <span className="text-xs text-gray-400">
-                    Created by : {project.createdBy}
+            <div className="flex items-center gap-2 mt-2">
+                <img
+                    src={`https://ui-avatars.com/api/?name=${project.owner?.name}`}
+                    className="w-6 h-6 rounded-full"
+                />
+                <span className="text-sm text-gray-600">
+                    {project.owner?.name}
                 </span>
-            </div>
+                </div>
         </div>
     )
 }

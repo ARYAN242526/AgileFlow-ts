@@ -7,4 +7,5 @@ export interface Project {
     name: string;
     email: string;
   };
+  members: string[];
 }

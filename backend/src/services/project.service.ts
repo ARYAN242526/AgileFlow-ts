@@ -49,6 +49,48 @@ export class ProjectService {
         ).populate("members.user", "name email avatar");
     }
 
+    static async updateMemberRole(projectId: string, userId: string, role: string) {
+
+        const project = await Project.findById(projectId);
+
+        if(!project) {
+            throw new Error("Project not found");
+        }
+
+        if(userId == project.owner.toString()){
+            throw new Error("Cannot modify owner");
+        }
+
+        return await Project.findOneAndUpdate(
+            { _id: projectId, "members.user": userId },
+            {
+                $set: { "members.$.role": role }
+            },
+            { returnDocument: "after"}
+        ).populate("members.user", "name email avatar");
+    }
+
+    static async removeMember(projectId: string, userId: string) {
+
+        const project = await Project.findById(projectId);
+
+        if (!project) {
+            throw new Error("Project not found");
+        }
+
+        if (userId === project.owner.toString()) {
+            throw new Error("Cannot remove owner");
+        }
+
+        return await Project.findByIdAndUpdate(
+            projectId,
+            {
+                $pull: { members : { user: userId } }
+            },
+            { returnDocument: "after" }
+        ).populate("members.user", "name email avatar");
+    }
+
     static async getProjectById(projectId: string) {
 
         const project = await Project.findById(projectId);

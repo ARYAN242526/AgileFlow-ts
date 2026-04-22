@@ -8,7 +8,9 @@ import {
     getProject,
     updateProject,
     deleteProject,
-    addMember
+    addMember,
+    updateMemberRole,
+    removeMember
 } from "../controllers/project.controller";
 
 const router = Router();
@@ -25,6 +27,18 @@ router.post(
     "/:projectId/members",
     authorizeRoles(ROLES.ADMIN, ROLES.PROJECT_MANAGER),
     addMember
+);
+
+router.patch(
+    ":projectId/members/:userId",
+    authorizeRoles(ROLES.ADMIN, ROLES.PROJECT_MANAGER),
+    updateMemberRole
+);
+
+router.delete(
+    "/:projectId/members/:userId",
+    authorizeRoles(ROLES.ADMIN, ROLES.PROJECT_MANAGER),
+    removeMember
 );
 
 router.get(

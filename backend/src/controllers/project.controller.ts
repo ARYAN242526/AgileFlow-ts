@@ -36,6 +36,32 @@ export const addMember = asyncHandler(async (req: Request, res: Response) => {
             .json(new ApiResponse(200, project, "Member added successfuly"));
 });
 
+export const updateMemberRole = asyncHandler(async (req: Request, res: Response) => {
+    const {projectId, userId} = req.params;
+    const {role} = req.body;
+
+    const project = await ProjectService.updateMemberRole(
+        projectId as string,
+        userId as string,
+        role,
+    );
+    
+    return res
+            .status(200)
+            .json(new ApiResponse(200, project, "Role Updated"));
+});
+
+export const removeMember = asyncHandler(async (req: Request, res: Response) => {
+    const {projectId, userId} = req.params;
+
+    const project = await ProjectService.removeMember(
+        projectId as string,
+        userId as string
+    );
+
+    return res.status(200).json(new ApiResponse(200, project, "Member removed"))
+})
+
 export const getProject = asyncHandler(async (req: Request, res: Response) => {
 
     const {id} = req.params;

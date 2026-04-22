@@ -11,6 +11,21 @@ export const addProjectMember = async (projectId: string, email: string) => {
     return res.data;
 };
 
+export const updateMemberRole = async (
+  projectId: string,
+  userId: string,
+  role: string
+) => {
+  return await api.patch(`/projects/${projectId}/members/${userId}`, { role });
+};
+
+export const removeMember = async (
+  projectId: string,
+  userId: string
+) => {
+  return await api.delete(`/projects/${projectId}/members/${userId}`);
+};
+
 export const createProject = async (data: {
     name: string;
     description: string

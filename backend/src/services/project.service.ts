@@ -32,21 +32,41 @@ export class ProjectService {
     }
 
     static async addMemberByEmail(projectId: string, email: string) {
-        const user = await User.findOne({ email });
+        const project  = await Project.findOne({ email });
 
-        if (!user) {
-            throw new Error("User not found");
+        if (!project) {
+            throw new ApiError(400, "Project not found");
         }
 
-        return await Project.findByIdAndUpdate(
-            projectId,
-            {
-            $addToSet: {
-                members: { user: user._id, role: "Member" }
-            }
-            },
-            { returnDocument : "after" }
-        ).populate("members.user", "name email avatar");
+        const user = await User.findOne({ email });
+
+        if(!user) {
+            throw new ApiError(400, "User not found");
+        }
+
+        if(project.owner.toString() === user._id.toString()){
+            throw new ApiError(400, "Owner is already part of project");
+        }
+
+        const alreadyMember = project.members?.some(
+            (m: any) => m.user.toString() === user._id.toString()
+        );
+
+        if (alreadyMember) {
+            throw new ApiError(400, "User already added");
+        }
+
+        // ✅ Add member
+        project.members.push({
+            user: user._id,
+            role: "Member",
+        });
+
+        await project.save();
+
+        return await Project.findById(projectId)
+            .populate("owner", "name email avatar")
+            .populate("members.user", "name email avatar");
     }
 
     static async updateMemberRole(projectId: string, userId: string, role: string) {
@@ -54,11 +74,11 @@ export class ProjectService {
         const project = await Project.findById(projectId);
 
         if(!project) {
-            throw new Error("Project not found");
+            throw new ApiError(400, "Project not found");
         }
 
         if(userId == project.owner.toString()){
-            throw new Error("Cannot modify owner");
+            throw new ApiError(400, "Cannot modify owner");
         }
 
         return await Project.findOneAndUpdate(
@@ -79,7 +99,7 @@ export class ProjectService {
         }
 
         if (userId === project.owner.toString()) {
-            throw new Error("Cannot remove owner");
+            throw new ApiError(400, "Cannot remove owner");
         }
 
         return await Project.findByIdAndUpdate(

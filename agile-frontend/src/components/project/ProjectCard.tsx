@@ -4,7 +4,7 @@ import {
   updateMemberRole,
   removeMember,
 } from "../../services/projectService";
-import AddMember from "./AddMember";
+import UserSearchDropdown from "./userSearchDropDown";
 import { useState } from "react";
 
 export default function ProjectCard({
@@ -16,6 +16,10 @@ export default function ProjectCard({
 }) {
   const navigate = useNavigate();
   const [showAdd, setShowAdd] = useState(false);
+
+  const filteredMembers = project.members?.filter(
+    (m: any) => m.user._id !== project.owner?._id
+  );
 
   return (
     <div
@@ -30,19 +34,34 @@ export default function ProjectCard({
         {project.description || "No description"}
       </p>
 
-      {/* Owner */}
-      <p className="text-xs text-gray-400 mt-3">
-        Created by: {project.owner?.name}
-      </p>
+      {/* ✅ OWNER */}
+      <div className="flex items-center gap-2 mt-3">
+        <img
+          src={
+            project.owner?.avatar ||
+            `https://ui-avatars.com/api/?name=${project.owner?.name || "User"}`
+          }
+          onError={(e) => {
+            e.currentTarget.src = `https://ui-avatars.com/api/?name=${project.owner?.name || "User"}`;
+          }}
+          className="w-7 h-7 rounded-full"
+        />
+        <span className="text-sm font-medium">
+          {project.owner?.name || "Unknown"}
+        </span>
 
-      {/* 🔥 Members Section */}
+        <span className="text-[10px] bg-yellow-200 px-2 py-0.5 rounded">
+          Owner
+        </span>
+      </div>
+
+      {/* MEMBERS */}
       <div className="mt-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-700">
             Members
           </span>
 
-          {/* ➕ Toggle Add */}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -54,82 +73,73 @@ export default function ProjectCard({
           </button>
         </div>
 
-        {/* Members List */}
         <div className="flex items-center gap-2 flex-wrap">
-          {project.members?.map((m: any) => {
-            const isOwner = m.user._id === project.owner?._id;
+          {filteredMembers?.map((m: any) => (
+            <div
+              key={m.user._id}
+              className="relative group flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* ✅ AVATAR FIX */}
+              <img
+                src={
+                  m.user?.avatar ||
+                  `https://ui-avatars.com/api/?name=${m.user?.name || "User"}`
+                }
+                onError={(e) => {
+                  e.currentTarget.src = `https://ui-avatars.com/api/?name=${m.user?.name || "User"}`;
+                }}
+                className="w-7 h-7 rounded-full"
+              />
 
-            return (
-              <div
-                key={m.user._id}
-                className="relative group flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full"
-                onClick={(e) => e.stopPropagation()}
+              {/* Name */}
+              <span className="text-xs">
+                {m.user?.name || "Unknown"}
+              </span>
+
+              {/* Role */}
+              <select
+                value={m.role}
+                onChange={(e) =>
+                  updateMemberRole(
+                    project._id,
+                    m.user._id,
+                    e.target.value
+                  ).then(refresh)
+                }
+                className="text-xs bg-transparent cursor-pointer"
               >
-                {/* Avatar */}
-                <img
-                  src={
-                    m.user.avatar ||
-                    `https://ui-avatars.com/api/?name=${m.user.name}`
+                <option value="Admin">Admin</option>
+                <option value="Member">Member</option>
+              </select>
+
+              {/* Remove */}
+              <button
+                onClick={() => {
+                  if (confirm("Remove member?")) {
+                    removeMember(project._id, m.user._id).then(refresh);
                   }
-                  className="w-7 h-7 rounded-full"
-                />
-
-                {/* Name */}
-                <span className="text-xs">{m.user.name}</span>
-
-                {/* Role */}
-                <select
-                  value={m.role}
-                  disabled={isOwner}
-                  onChange={(e) =>
-                    updateMemberRole(
-                      project._id,
-                      m.user._id,
-                      e.target.value
-                    ).then(refresh)
-                  }
-                  className={`text-xs bg-transparent ${
-                    isOwner
-                      ? "text-gray-400 cursor-not-allowed"
-                      : "cursor-pointer"
-                  }`}
-                >
-                  <option value="Admin">Admin</option>
-                  <option value="Member">Member</option>
-                </select>
-
-                {/* 👑 Owner */}
-                {isOwner && (
-                  <span className="text-[10px] bg-yellow-200 px-1 rounded">
-                    Owner
-                  </span>
-                )}
-
-                {/* ❌ Remove */}
-                {!isOwner && (
-                  <button
-                    onClick={() => {
-                      if (confirm("Remove member?")) {
-                        removeMember(project._id, m.user._id).then(refresh);
-                      }
-                    }}
-                    className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 hidden group-hover:flex items-center justify-center"
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-            );
-          })}
+                }}
+                className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 hidden group-hover:flex items-center justify-center"
+              >
+                ×
+              </button>
+            </div>
+          ))}
         </div>
 
-        {/* ➕ Add Member UI */}
+        {/* ADD MEMBER */}
         {showAdd && (
           <div
             className="mt-3"
             onClick={(e) => e.stopPropagation()}
           >
-            <AddMember projectId={project._id} onAdded={refresh} />
+            <UserSearchDropdown
+              projectId={project._id}
+              onAdded={refresh}
+              existingMembers={project.members}
+              ownerId={project.owner?._id}
+            />
           </div>
         )}
       </div>

@@ -5,7 +5,14 @@ export interface Project {
     owner: {
     _id: string;
     name: string;
-    email: string;
+    avatar?: string;
   };
-  members: string[];
+  members: {
+    user: {
+      _id: string;
+      name: string;
+      avatar?: string;
+    };
+    role: string
+  }[];
 }

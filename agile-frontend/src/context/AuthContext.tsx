@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 interface User {
     _id: string;
+    name: string;
     email: string;
     role: string;
     avatar: string;
@@ -16,7 +17,12 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const useAuth = () => {
-    return useContext(AuthContext)!;
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuth must be used inside AuthProvider");
+    }
+    return context;
+
 }
 
 export const AuthProvider = ({ children }: { children: React.ReactNode}) => {

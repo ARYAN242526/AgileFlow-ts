@@ -4,7 +4,7 @@ import {
   updateMemberRole,
   removeMember,
 } from "../../services/projectService";
-import UserSearchDropdown from "./userSearchDropDown";
+import UserSearchDropdown from "./UserSearchDropdown";
 import { useState } from "react";
 
 export default function ProjectCard({

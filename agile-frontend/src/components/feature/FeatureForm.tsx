@@ -22,7 +22,7 @@ export default function FeatureForm({
 
   return (
     <div className="bg-white p-4 rounded-xl shadow mb-6">
-      <h2 className="font-semibold mb-3">Create Feature</h2>
+      
 
       {/* Title */}
       <input

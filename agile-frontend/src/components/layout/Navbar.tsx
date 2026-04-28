@@ -1,29 +1,13 @@
 import { useAuth } from "../../context/AuthContext";
-import { useTheme } from "../../context/ThemeContext";
 
 export default function Navbar() {
   const { user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
-
-  const handleToggleTheme = () => {
-    console.log("before:", theme);
-    toggleTheme();
-  } 
 
   return (
     <div className="h-16 bg-white dark:bg-gray-900 border-b dark:border-gray-700 
                     flex items-center justify-end px-6">
 
       <div className="flex items-center gap-4">
-
-        {/* 🌙 Theme Toggle */}
-        <button
-          onClick={handleToggleTheme}
-          className="text-xl bg-gray-100 dark:bg-gray-800 p-2 rounded-full 
-                     hover:scale-105 transition"
-        >
-          {theme === "dark" ? "🌙" : "☀️"}
-        </button>
 
         {/* 👤 User Avatar */}
         <div className="relative group cursor-pointer">

@@ -14,7 +14,7 @@ export const authorizeRoles = (...allowedRoles: ROLES[]) => {
         if(!allowedRoles.includes(userRole)){
             throw new ApiError(
                 403,
-                `Role '${userRole}' is not allowed to access this resource`
+                "You are not authorized to perform this action"
             );
         }
         next();

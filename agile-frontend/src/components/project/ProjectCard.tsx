@@ -6,6 +6,8 @@ import {
 } from "../../services/projectService";
 import UserSearchDropdown from "./UserSearchDropdown";
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { ROLES } from "../../constants/roles";
 
 export default function ProjectCard({
   project,
@@ -16,6 +18,18 @@ export default function ProjectCard({
 }) {
   const navigate = useNavigate();
   const [showAdd, setShowAdd] = useState(false);
+
+  const {user} = useAuth();
+
+  const currentUserRole = 
+  project.owner?._id === user?._id
+    ? ROLES.ADMIN // owner is always admin
+    : project.members.find((m: any) => m.user._id === user?._id)?.role;
+
+  const canDelete =
+  currentUserRole === ROLES.ADMIN ||
+  currentUserRole === ROLES.PROJECT_MANAGER;  
+
 
   const filteredMembers = project.members?.filter(
     (m: any) => m.user._id !== project.owner?._id
@@ -109,21 +123,26 @@ export default function ProjectCard({
                 }
                 className="text-xs bg-transparent cursor-pointer"
               >
-                <option value="Admin">Admin</option>
-                <option value="Member">Member</option>
+                {Object.values(ROLES).map((role) => (
+                  <option key={role} value={role}>
+                    {role}
+                  </option>
+                ))}
               </select>
 
               {/* Remove */}
-              <button
-                onClick={() => {
-                  if (confirm("Remove member?")) {
-                    removeMember(project._id, m.user._id).then(refresh);
-                  }
-                }}
-                className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 hidden group-hover:flex items-center justify-center"
-              >
-                ×
-              </button>
+              {canDelete && (
+                <button
+                  onClick={() => {
+                    if (confirm("Remove member?")) {
+                      removeMember(project._id, m.user._id).then(refresh);
+                    }
+                  }}
+                  className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 hidden group-hover:flex items-center justify-center"
+                >
+                  ×
+                </button>
+              )}
             </div>
           ))}
         </div>

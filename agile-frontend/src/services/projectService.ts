@@ -1,13 +1,21 @@
 import api from "./api";
 import type { Project } from "../types/project";
+import { Role } from "../constants/roles";
 
 export const getProjects = async () : Promise<Project[]> => {
     const res = await api.get("/projects");
     return res.data.data;
 };
 
-export const addProjectMember = async (projectId: string, email: string) => {
-    const res = await api.post(`/projects/${projectId}/members`, { email });
+export const addProjectMember = async (
+  projectId: string,
+  email: string,
+  role: Role
+) => {
+    const res = await api.post(`/projects/${projectId}/members`, { 
+      email,
+      role,
+    });
     return res.data;
 };
 

@@ -1,5 +1,5 @@
-import mongoose , {Document} from "mongoose";
-import { Types } from "mongoose";
+import mongoose, {Document, Types} from "mongoose";
+import { ROLES } from "../constants/roles";
 
 export interface IProject extends Document {
     name: string;
@@ -7,7 +7,7 @@ export interface IProject extends Document {
     owner: Types.ObjectId;
     members: {
         user: Types.ObjectId;
-        role: "Admin" | "Member";
+        role: ROLES;
     }[];
     createdAt: Date;
     updatedAt: Date;
@@ -33,11 +33,12 @@ const projectSchema = new mongoose.Schema<IProject>(
                 user: {
                     type: mongoose.Schema.Types.ObjectId,
                     ref: "User",
+                    required: true
                 },
                 role: {
                     type: String,
-                    enum: ["Admin", "Member"],
-                    default: "Member",
+                    enum: Object.values(ROLES),
+                    default: ROLES.VIEWER,
                 },
             },
         ],
@@ -45,6 +46,11 @@ const projectSchema = new mongoose.Schema<IProject>(
     {
         timestamps: true
     }
+);
+
+projectSchema.index(
+    { _id: 1, "members.user": 1},
+    {unique: true}
 );
 
 export const Project = mongoose.model<IProject>("Project", projectSchema);

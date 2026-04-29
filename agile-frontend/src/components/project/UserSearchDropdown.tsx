@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { searchUsers } from "../../services/userService";
 import { addProjectMember } from "../../services/projectService";
+import { ROLES } from "../../constants/roles";
 
 // ✅ Proper User type
 interface User {
@@ -57,17 +58,18 @@ export default function UserSearchDropdown({
 
     const delay = setTimeout(fetchUsers, 300);
     return () => clearTimeout(delay);
-  }, [query, projectId]);
+  }, [query, projectId, ownerId, existingMembers]);
 
   const handleSelect = async (user: User) => {
     try {
-      await addProjectMember(projectId, user.email);
+      await addProjectMember(projectId, user.email, ROLES.DEVELOPER);
+      
       setQuery("");
       setUsers([]);
       setShow(false);
       onAdded();
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error(err.response?.data || err.message);
     }
   };
 

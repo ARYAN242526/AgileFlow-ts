@@ -30,7 +30,7 @@ router.post(
 );
 
 router.patch(
-    ":projectId/members/:userId",
+    "/:projectId/members/:userId",
     authorizeRoles(ROLES.ADMIN, ROLES.PROJECT_MANAGER),
     updateMemberRole
 );

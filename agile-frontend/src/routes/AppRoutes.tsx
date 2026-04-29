@@ -35,7 +35,7 @@ export default function AppRoutes() {
             <Route path="/dashboard" element={<DashboardPage />} />
 
             {/* Role-based routes */}
-            <Route element={<RoleProtectedRoute allowedRoles={["Admin", "ProjectManager"]} />}>
+            <Route element={<RoleProtectedRoute allowedRoles={["Admin", "ProjectManager", "Developer"]} />}>
               <Route path="/projects" element={<ProjectsPage />} />
             </Route>
 

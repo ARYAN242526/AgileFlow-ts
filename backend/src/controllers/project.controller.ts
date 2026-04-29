@@ -27,9 +27,9 @@ export const getProjects = asyncHandler(async (req: Request, res: Response) => {
 
 export const addMember = asyncHandler(async (req: Request, res: Response) => {
     const {projectId} = req.params;
-    const {email} = req.body;
+    const {email, role} = req.body;
 
-    const project = await ProjectService.addMemberByEmail(projectId as string, email);
+    const project = await ProjectService.addMemberByEmail(projectId as string, email, role);
 
     return res
             .status(200)

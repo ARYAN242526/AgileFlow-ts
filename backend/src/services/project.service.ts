@@ -1,6 +1,7 @@
 import { Project } from "../models/project.model";
 import { User } from "../models/user.model";
 import { ApiError } from "../utils/ApiError";
+import { ROLES } from "../constants/roles";
 
 export class ProjectService {
 
@@ -31,8 +32,12 @@ export class ProjectService {
         return projects;
     }
 
-    static async addMemberByEmail(projectId: string, email: string) {
-        const project  = await Project.findOne({ email });
+    static async addMemberByEmail(
+        projectId: string, 
+        email: string,
+        role: ROLES
+    ) {
+        const project  = await Project.findById(projectId);
 
         if (!project) {
             throw new ApiError(400, "Project not found");
@@ -56,10 +61,14 @@ export class ProjectService {
             throw new ApiError(400, "User already added");
         }
 
+         if (!Object.values(ROLES).includes(role)) {
+            throw new ApiError(400, "Invalid role");
+        }
+
         // ✅ Add member
         project.members.push({
             user: user._id,
-            role: "Member",
+            role: role,
         });
 
         await project.save();
@@ -81,13 +90,27 @@ export class ProjectService {
             throw new ApiError(400, "Cannot modify owner");
         }
 
-        return await Project.findOneAndUpdate(
+         if (!Object.values(ROLES).includes(role as any)) {
+            throw new ApiError(400, "Invalid role");
+        }
+
+        const memberExists = project.members.some(
+            (m: any) => m.user.toString() === userId
+        );
+
+        if (!memberExists) {
+            throw new ApiError(404, "Member not found in project");
+        }
+
+        const updatedProject =  await Project.findOneAndUpdate(
             { _id: projectId, "members.user": userId },
             {
                 $set: { "members.$.role": role }
             },
-            { returnDocument: "after"}
+            { returnDocument: "after" }
         ).populate("members.user", "name email avatar");
+
+        return updatedProject;
     }
 
     static async removeMember(projectId: string, userId: string) {

@@ -1,6 +1,7 @@
 import { Feature } from "../models/feature.model";
 import { Sprint } from "../models/sprint.model";
 import { ApiError } from "../utils/ApiError";
+import { SprintService } from "./sprint.service";
 
 export class FeatureService {
 
@@ -80,6 +81,10 @@ export class FeatureService {
 
         if (!feature) {
             throw new ApiError(404, "Feature not found");
+        }
+
+        if(feature.sprint && data.status) {
+           await SprintService.updateSprintStatus(feature.sprint.toString());
         }
 
         return feature;

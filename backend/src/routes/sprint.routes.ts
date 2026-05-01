@@ -2,8 +2,7 @@ import express from 'express';
 import {
     createSprint,
     getProjectSprints,
-    startSprint,
-    completeSprint,
+    getSprintProgress,
     deleteSprint 
 } from '../controllers/sprint.controller';
 
@@ -11,14 +10,16 @@ import { authenticate } from '../middleware/auth.middleware';
 
 const router = express.Router();
 
+// create sprint
 router.post("/:projectId", authenticate, createSprint);
 
-router.get("/:projectId", authenticate, getProjectSprints);
+// get all sprints of a progress (WITH status + progress)
+router.get("/project/:projectId", authenticate, getProjectSprints);
 
-router.patch("/start/:id", authenticate, startSprint);
+// get single sprint (WITH status + progress)
+router.get("/details/:sprintId", authenticate, getSprintProgress);
 
-router.patch("/complete/:id", authenticate, completeSprint);
-
+// delete sprint
 router.delete("/:id", authenticate, deleteSprint);
 
 export default router;

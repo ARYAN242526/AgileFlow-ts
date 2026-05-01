@@ -21,7 +21,7 @@ const sprintSchema = new mongoose.Schema<ISprint>(
         project: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Project",
-            requird: true
+            required: true
         },
         startDate: Date,
         endDate: Date,

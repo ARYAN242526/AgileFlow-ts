@@ -3,6 +3,8 @@ import { SprintService } from "../services/sprint.service";
 import { asyncHandler } from "../utils/asyncHandler";
 import { ApiResponse } from "../utils/ApiResponse";
 
+
+//  Create Sprint
 export const createSprint = asyncHandler(async (req: Request, res: Response) => {
 
     const { projectId } = req.params;
@@ -14,11 +16,13 @@ export const createSprint = asyncHandler(async (req: Request, res: Response) => 
     );
 });
 
+
+//  Get ALL sprints with progress + correct status
 export const getProjectSprints = asyncHandler(async (req: Request, res: Response) => {
 
     const { projectId } = req.params;
 
-    const sprints = await SprintService.getProjectSprints(projectId as string) || [];
+    const sprints = await SprintService.getProjectSprintsWithStatus(projectId as string);
 
     res.status(200).json(
         new ApiResponse(200, sprints, "Sprints fetched")
@@ -26,25 +30,15 @@ export const getProjectSprints = asyncHandler(async (req: Request, res: Response
 });
 
 
-export const startSprint = asyncHandler(async (req: Request, res: Response) => {
+//  Get SINGLE sprint with progress
+export const getSprintProgress = asyncHandler(async (req: Request, res: Response) => {
 
-    const { id } = req.params;
+    const { sprintId } = req.params;
 
-    const sprint = await SprintService.startSprint(id as string);
-
-    res.status(200).json(
-        new ApiResponse(200, sprint, "Sprint started")
-    );
-});
-
-export const completeSprint = asyncHandler(async (req: Request, res: Response) => {
-
-    const { id } = req.params;
-
-    const sprint = await SprintService.completeSprint(id as string);
+    const sprint = await SprintService.getSprintWithStatus(sprintId as string);
 
     res.status(200).json(
-        new ApiResponse(200, sprint, "Sprint completed")
+        new ApiResponse(200, sprint, "Sprint progress fetched")
     );
 });
 

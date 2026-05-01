@@ -6,10 +6,11 @@ export interface Sprint {
     startDate: string;
     endDate: string;
 
-    status: "PLANNED" | "ACTIVE" | "COMPLETED";
+    status: "planned" | "active" | "completed";
 
     project: {
         _id: string;
         name: string;
     };
+    progress?: number;
 }

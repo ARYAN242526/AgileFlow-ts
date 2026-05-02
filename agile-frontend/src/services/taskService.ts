@@ -1,4 +1,5 @@
 import api from "./api";
+import type { Task } from "../types/task";
 
 export const getFeatureTasks = async (featureId: string) => {
     const res = await api.get(`/tasks/feature/${featureId}`);
@@ -37,6 +38,19 @@ export const updateTaskAssignee = async(taskId: string, assigneeId: string) => {
 
     return res.data;
 };
+
+export const updateTask = async (
+    taskId: string,
+    data: {
+        title: string;
+        description?: string;
+        priority: "low" | "medium" | "high";
+        assignne?: string
+    }
+) : Promise<Task> => {
+    const res = await api.patch(`/tasks/${taskId}`, data);
+    return res.data.data;
+}
 
 export const deleteTask = async(id: string) => {
     await api.delete(`/tasks/${id}`);

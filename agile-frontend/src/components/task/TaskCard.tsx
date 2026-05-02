@@ -1,144 +1,190 @@
 import { useDraggable } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
 import type { Task } from "../../types/task";
-import { deleteTask, updateTaskAssignee } from "../../services/taskService";
+import {
+  deleteTask,
+  updateTaskAssignee,
+  updateTask,
+} from "../../services/taskService";
 import { getUsers } from "../../services/userService";
-
+import EditTaskModal from "./EditTaskModal";
 
 export default function TaskCard({
-    task,
-    refresh,
+  task,
+  refresh,
 }: {
-    task: Task;
-    refresh: () => void;
+  task: Task;
+  refresh: () => void;
 }) {
 
-    const { attributes, listeners, setNodeRef, transform } = useDraggable({
-        id: task._id,
-    });
+  // 🔥 disable drag when modal open
+  const [showEdit, setShowEdit] = useState(false);
 
-    const style = {
-        transform: transform
-            ? `translate3d(${transform.x}px, ${transform.y}px)`
-            : undefined,
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: task._id,
+    disabled: showEdit, // ✅ important
+  });
+
+  const style = {
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px)`
+      : undefined,
+  };
+
+  // assignee state
+  const [showUsers, setShowUsers] = useState(false);
+  const [users, setUsers] = useState<any[]>([]);
+  const [currentAssignee, setCurrentAssignee] = useState(task.assignee);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const data = await getUsers();
+      setUsers(data);
     };
+    fetchUsers();
+  }, []);
 
-    // assignee state
-    const [showUsers, setShowUsers] = useState(false);
-    const [users, setUsers] = useState<any[]>([]);
-    const [currentAssignee, setCurrentAssignee] = useState(task.assignee);
+  const handleAssign = async (user: any) => {
+    setCurrentAssignee(user);
+    setShowUsers(false);
 
-      useEffect(() => {
-        const fetchUsers = async () => {
-          const data = await getUsers();
-          setUsers(data);
-        };
-        fetchUsers();
-    }, []);
+    try {
+      await updateTaskAssignee(task._id, user._id);
+    } catch {
+      refresh();
+    }
+  };
 
-      const handleAssign = async (user: any) => {
-        setCurrentAssignee(user); // optimistic UI
-        setShowUsers(false);
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    await deleteTask(task._id);
+    refresh();
+  };
 
-        try {
-          await updateTaskAssignee(task._id, user._id);
-        } catch {
-          refresh(); // fallback
-        }
-      };
+  const handleUpdate = async (data: any) => {
+    await updateTask(task._id, data);
+    setShowEdit(false);
+    refresh();
+  };
 
-    const handleDelete = async (e: React.MouseEvent) => {
-        e.stopPropagation();
-        await deleteTask(task._id);
-        refresh();
-    };
-
-     return (
-        <div
+  return (
+    <>
+      {/* 🔥 TASK CARD */}
+      <div
         ref={setNodeRef}
         style={style}
-        {...listeners}
+        {...(!showEdit ? listeners : {})}   // ✅ disable drag listeners
         {...attributes}
         className="bg-white p-4 rounded-xl shadow-sm border hover:shadow-md transition cursor-grab active:cursor-grabbing relative"
-    >
-      <h4 className="font-semibold text-gray-800">{task.title}</h4>
+      >
 
-      <p className="text-xs text-gray-500 mt-1">{task.description}</p>
+        {/* HEADER */}
+        <div className="flex justify-between items-start">
+          <h4 className="font-semibold text-gray-800">
+            {task.title}
+          </h4>
 
-      <div className="mt-2 relative">
-        {currentAssignee ? (
-          <div
-            className="flex items-center gap-2 cursor-pointer"
-            onClick={(e) => {
-              e.stopPropagation(); // ❗ prevent drag
-              setShowUsers(!showUsers);
-            }}
-          >
-            <img
-              src={currentAssignee.avatar}
-              alt={currentAssignee.name}
-              className="w-6 h-6 rounded-full border"
-            />
-            <span className="text-xs text-gray-600">
-              {currentAssignee.name}
-            </span>
-          </div>
-        ) : (
-          <div
+          <button
             onClick={(e) => {
               e.stopPropagation();
-              setShowUsers(!showUsers);
+              setShowEdit(true);
             }}
-            className="text-xs text-gray-400 cursor-pointer"
+            className="text-[10px] bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
           >
-            Assign user
-          </div>
-        )}
+            Edit
+          </button>
+        </div>
 
-        {/* 🔥 Dropdown */}
-        {showUsers && (
-          <div
-            className="absolute z-10 bg-white border shadow-md rounded mt-2 w-40"
-            onClick={(e) => e.stopPropagation()} // ❗ prevent drag
-          >
-            {users.map((u) => (
-              <div
-                key={u._id}
-                onClick={() => handleAssign(u)}
-                className={`flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100 ${
-                  currentAssignee?._id === u._id ? "bg-blue-50" : ""
-                }`}
-              >
-                <img
-                  src={u.avatar}
-                  className="w-5 h-5 rounded-full"
-                />
-                <span className="text-xs">{u.name}</span>
-              </div>
-            ))}
-          </div>
-        )}
+        <p className="text-xs text-gray-500 mt-1">
+          {task.description}
+        </p>
+
+        {/* ASSIGNEE */}
+        <div className="mt-2 relative">
+          {currentAssignee ? (
+            <div
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowUsers(!showUsers);
+              }}
+            >
+              <img
+                src={currentAssignee.avatar}
+                className="w-6 h-6 rounded-full border"
+              />
+              <span className="text-xs text-gray-600">
+                {currentAssignee.name}
+              </span>
+            </div>
+          ) : (
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowUsers(!showUsers);
+              }}
+              className="text-xs text-gray-400 cursor-pointer"
+            >
+              Assign user
+            </div>
+          )}
+
+          {/* DROPDOWN */}
+          {showUsers && (
+            <div
+              className="absolute z-10 bg-white border shadow-md rounded mt-2 w-40"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {users.map((u) => (
+                <div
+                  key={u._id}
+                  onClick={() => handleAssign(u)}
+                  className={`flex items-center gap-2 p-2 cursor-pointer hover:bg-gray-100 ${
+                    currentAssignee?._id === u._id
+                      ? "bg-blue-50"
+                      : ""
+                  }`}
+                >
+                  <img src={u.avatar} className="w-5 h-5 rounded-full" />
+                  <span className="text-xs">{u.name}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* PRIORITY */}
+        <span
+          className={`inline-block mt-2 text-xs px-2 py-1 rounded-full ${
+            task.priority === "high"
+              ? "bg-red-100 text-red-600"
+              : task.priority === "medium"
+              ? "bg-yellow-100 text-yellow-600"
+              : "bg-green-100 text-green-600"
+          }`}
+        >
+          {task.priority}
+        </span>
+
+        {/* DELETE */}
+        <button
+          onClick={handleDelete}
+          className="block mt-3 text-xs text-red-500 hover:underline"
+        >
+          Delete
+        </button>
       </div>
 
-      {/* 🔥 Priority Badge */}
-      <span
-        className={`inline-block mt-2 text-xs px-2 py-1 rounded-full ${
-          task.priority === "high"
-            ? "bg-red-100 text-red-600"
-            : task.priority === "medium"
-            ? "bg-yellow-100 text-yellow-600"
-            : "bg-green-100 text-green-600"
-        }`}
-      >
-        {task.priority}
-      </span>
-
-      <button
-        onClick={handleDelete}
-        className="block mt-3 text-xs text-red-500 hover:underline"
-      >
-        Delete
-      </button>
-    </div>
+      {/* 🔥 MODAL (OUTSIDE CARD) */}
+      {showEdit && (
+        <div className="fixed inset-0 z-[9999]">
+          <EditTaskModal
+            task={task}
+            onClose={() => setShowEdit(false)}
+            onUpdate={handleUpdate}
+          />
+        </div>
+      )}
+    </>
   );
 }

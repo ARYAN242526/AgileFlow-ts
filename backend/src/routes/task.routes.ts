@@ -66,7 +66,6 @@ router.patch(
   authorizeRoles(
     ROLES.ADMIN,
     ROLES.PROJECT_MANAGER,
-    ROLES.DEVELOPER
   ),
   updateTask
 );

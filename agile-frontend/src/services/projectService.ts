@@ -34,6 +34,14 @@ export const removeMember = async (
   return await api.delete(`/projects/${projectId}/members/${userId}`);
 };
 
+export const updateProject = async (
+  projectId: string,
+  data: {name: string, description?: string}
+): Promise<Project> => {
+  const res = await api.patch(`/projects/${projectId}`, data);
+  return res.data.data;
+}
+
 export const createProject = async (data: {
     name: string;
     description: string

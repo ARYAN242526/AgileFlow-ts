@@ -2,6 +2,7 @@ import { log } from "node:console";
 import { Feature } from "../models/feature.model";
 import { Task } from "../models/task.model";
 import { ApiError } from "../utils/ApiError";
+import { SprintService } from "./sprint.service";
 
 export class TaskService {
 
@@ -112,23 +113,43 @@ export class TaskService {
         const tasks = await Task.find({ feature: featureId });
 
         if (tasks.length === 0) {
-            await Feature.findByIdAndUpdate(featureId, { status: "planned" });
+            const feature = await Feature.findByIdAndUpdate(
+                featureId,
+                { status: "planned" },
+                { returnDocument : "after" }
+            );
+
+            if (feature?.sprint) {
+                await SprintService.updateSprintStatus(feature.sprint.toString());
+            }
+
             return;
         }
 
-        const doneCount = tasks.filter(t => t.status === "done").length;
+        const completedCount = tasks.filter(t => t.status === "done").length;
 
-        let status: "planned" | "in-progress" | "done" = "planned";
+        let status: "planned" | "in-progress" | "completed" = "planned";
 
-        if (doneCount === 0) {
+        if (completedCount === 0) {
             status = "planned";
-        } else if (doneCount === tasks.length) {
-            status = "done";
-        } else {
+        } 
+        else if (completedCount === tasks.length) {
+            status = "completed"; //  FIXED
+        } 
+        else {
             status = "in-progress";
         }
 
-        await Feature.findByIdAndUpdate(featureId, { status });
-    }
+        const feature = await Feature.findByIdAndUpdate(
+            featureId,
+            { status },
+            { returnDocument : "after" }
+        );
 
+        // IMPORTANT: update sprint also
+        if (feature?.sprint) {
+            await SprintService.updateSprintStatus(feature.sprint.toString());
+        }
+    }
+   
 }

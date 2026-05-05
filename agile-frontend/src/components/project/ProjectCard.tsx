@@ -5,6 +5,7 @@ import {
   updateMemberRole,
   removeMember,
   updateProject,
+  deleteProject,
 } from "../../services/projectService";
 import UserSearchDropdown from "./UserSearchDropdown";
 import { useState } from "react";
@@ -37,11 +38,29 @@ export default function ProjectCard({
     (m: any) => m.user._id !== project.owner?._id
   );
 
-  //  UPDATE HANDLER
+  // ✅ UPDATE HANDLER
   const handleUpdate = async (data: any) => {
     await updateProject(project._id, data);
     setShowEdit(false);
     refresh();
+  };
+
+  // 🔥 DELETE HANDLER (NEW)
+  const handleDeleteProject = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // ❗ prevent navigation
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this project?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await deleteProject(project._id);
+      refresh(); // reload projects
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete project");
+    }
   };
 
   return (
@@ -51,22 +70,34 @@ export default function ProjectCard({
         onClick={() => navigate(`/projects/${project._id}/sprints`)}
         className="bg-white p-5 rounded-xl shadow hover:shadow-md transition cursor-pointer"
       >
-        {/*  HEADER WITH EDIT */}
+        {/* HEADER WITH EDIT + DELETE */}
         <div className="flex justify-between items-center">
           <h2 className="font-semibold text-lg">{project.name}</h2>
 
-          {/*  EDIT BUTTON */}
-          {currentUserRole === ROLES.ADMIN && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation(); // 🔥 prevent navigation
-                setShowEdit(true);
-              }}
-              className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
-            >
-              Edit
-            </button>
-          )}
+          <div className="flex gap-2">
+            {/* EDIT */}
+            {currentUserRole === ROLES.ADMIN && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowEdit(true);
+                }}
+                className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
+              >
+                Edit
+              </button>
+            )}
+
+            {/* 🔥 DELETE PROJECT */}
+            {canDelete && (
+              <button
+                onClick={handleDeleteProject}
+                className="text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
+              >
+                Delete
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Description */}
@@ -186,7 +217,7 @@ export default function ProjectCard({
         </div>
       </div>
 
-      {/*  EDIT MODAL */}
+      {/* EDIT MODAL */}
       {showEdit && (
         <EditProjectModal
           project={project}

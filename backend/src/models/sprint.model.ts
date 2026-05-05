@@ -24,7 +24,13 @@ const sprintSchema = new mongoose.Schema<ISprint>(
             required: true
         },
         startDate: Date,
-        endDate: Date,
+        endDate: {
+            type: Date,
+            validators: function(value: Date) {
+                return !this.startDate || value >= this.startDate;
+            },
+            message: "End date must be greater than or equal to start date" 
+        },
         status: {
             type: String,
             enum: ["planned", "active", "completed"],

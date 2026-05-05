@@ -15,6 +15,11 @@ export default function SprintForm({
     const handleSubmit = () => {
         if(!name || !projectId) return;
 
+        if(new Date(startDate) > new Date(endDate)) {
+            alert("Start date cannot be after end date");
+            return;
+        }
+
         onCreate({ name, startDate, endDate, projectId });
 
         setName("");

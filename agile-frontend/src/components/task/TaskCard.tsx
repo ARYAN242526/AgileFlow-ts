@@ -8,6 +8,8 @@ import {
 } from "../../services/taskService";
 import { getUsers } from "../../services/userService";
 import EditTaskModal from "./EditTaskModal";
+import { useAuth } from "../../context/AuthContext";
+import { ROLES } from "../../constants/roles";
 
 export default function TaskCard({
   task,
@@ -17,17 +19,26 @@ export default function TaskCard({
   refresh: () => void;
 }) {
 
-  // 🔥 disable drag when modal open
+  const { user } = useAuth();
+
+  //  check drag permission
+  const canDrag =
+    task.assignee?._id === user?._id ||
+    user?.role === ROLES.ADMIN ||
+    user?.role === ROLES.PROJECT_MANAGER;
+
+  //  disable drag when modal open
   const [showEdit, setShowEdit] = useState(false);
 
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: task._id,
-    disabled: showEdit, // ✅ important
-  });
+  const { attributes, listeners, setNodeRef, transform } =
+    useDraggable({
+      id: task._id,
+      disabled: showEdit || !canDrag, //  important
+    });
 
   const style = {
     transform: transform
-      ? `translate3d(${transform.x}px, ${transform.y}px)`
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
       : undefined,
   };
 
@@ -41,6 +52,7 @@ export default function TaskCard({
       const data = await getUsers();
       setUsers(data);
     };
+
     fetchUsers();
   }, []);
 
@@ -57,8 +69,11 @@ export default function TaskCard({
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    await deleteTask(task._id);
-    refresh();
+
+    if (confirm("Delete this task?")) {
+      await deleteTask(task._id);
+      refresh();
+    }
   };
 
   const handleUpdate = async (data: any) => {
@@ -69,13 +84,17 @@ export default function TaskCard({
 
   return (
     <>
-      {/* 🔥 TASK CARD */}
+      {/* TASK CARD */}
       <div
         ref={setNodeRef}
         style={style}
-        {...(!showEdit ? listeners : {})}   // ✅ disable drag listeners
+        {...(!showEdit && canDrag ? listeners : {})}
         {...attributes}
-        className="bg-white p-4 rounded-xl shadow-sm border hover:shadow-md transition cursor-grab active:cursor-grabbing relative"
+        className={`bg-white p-4 rounded-xl shadow-sm border hover:shadow-md transition relative ${
+          canDrag
+            ? "cursor-grab active:cursor-grabbing"
+            : "cursor-not-allowed opacity-80"
+        }`}
       >
 
         {/* HEADER */}
@@ -113,6 +132,7 @@ export default function TaskCard({
                 src={currentAssignee.avatar}
                 className="w-6 h-6 rounded-full border"
               />
+
               <span className="text-xs text-gray-600">
                 {currentAssignee.name}
               </span>
@@ -145,8 +165,14 @@ export default function TaskCard({
                       : ""
                   }`}
                 >
-                  <img src={u.avatar} className="w-5 h-5 rounded-full" />
-                  <span className="text-xs">{u.name}</span>
+                  <img
+                    src={u.avatar}
+                    className="w-5 h-5 rounded-full"
+                  />
+
+                  <span className="text-xs">
+                    {u.name}
+                  </span>
                 </div>
               ))}
             </div>
@@ -175,7 +201,7 @@ export default function TaskCard({
         </button>
       </div>
 
-      {/* 🔥 MODAL (OUTSIDE CARD) */}
+      {/* MODAL */}
       {showEdit && (
         <div className="fixed inset-0 z-[9999]">
           <EditTaskModal

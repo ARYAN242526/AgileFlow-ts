@@ -3,6 +3,7 @@ import { Feature } from "../models/feature.model";
 import { Task } from "../models/task.model";
 import { ApiError } from "../utils/ApiError";
 import { SprintService } from "./sprint.service";
+import { ROLES } from "../constants/roles";
 
 export class TaskService {
 
@@ -94,11 +95,24 @@ export class TaskService {
         await this.updateFeatureStatus(task.feature.toString());
     }
 
-    static async updateStatus(taskId: string, status: string) {
+    static async updateStatus(
+        taskId: string, 
+        status: string,
+        userId: string,
+        userRole: string
+    ) {
         const task = await Task.findById(taskId);
 
         if(!task) {
             throw new ApiError(404, "Task not found");
+        }
+
+        const isAssignee = task.assignee?.toString() === userId;
+
+        const isManager = userRole === ROLES.ADMIN || userRole === ROLES.PROJECT_MANAGER;
+
+        if(!isAssignee && !isManager) {
+            throw new ApiError(403, "Only assignee can move this task");
         }
 
         task.status = status as any;

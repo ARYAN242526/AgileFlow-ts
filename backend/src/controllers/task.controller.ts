@@ -53,7 +53,12 @@ export const updateTaskStatus = asyncHandler(async (req: Request, res: Response)
   const { id } = req.params;
   const { status } = req.body;
 
-  const task = await TaskService.updateStatus(id as string, status);
+  const task = await TaskService.updateStatus(
+    id as string, 
+    status, 
+    req.user?._id as string, 
+    req.user?.role as string
+  );
 
   res.status(200).json(
     new ApiResponse(200, task, "Task status updated")
